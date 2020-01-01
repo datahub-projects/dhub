@@ -1,0 +1,4 @@
+#!/usr/bin/python3
+
+print ("ver -- versioning for the masses\nversion 0.0.1")
+
