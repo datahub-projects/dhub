@@ -1,6 +1,6 @@
-## ver -- versioning for the masses
+# ver -- versioning for the masses
 
-# commands:
+## commands:
 
 * status [sub1[, sub2]]
 
