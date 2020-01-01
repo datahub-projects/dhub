@@ -1,7 +1,16 @@
 #!/usr/bin/python3
 from run_git import git
+from grep import grep
 
-print ("ver -- versioning for the masses")
+print ("ver -- Versioning Easily Remembered")
 
-out, good = git("status")
+out, good = git("status -u no")
 print(out)
+
+out, good = git("submodule status --recursive")
+print(out)
+
+out, good = git("diff")
+out = grep("Subproject commit", out)
+print(out)
+
