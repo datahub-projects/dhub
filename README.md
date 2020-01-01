@@ -23,13 +23,15 @@ If data needed is not cached, prompt user that data needs to be downloaded (over
 
 Print a list of all untracked files and folders, recursively in all submodules
 
-* up [commit|branch]
+* up [commit|branch] [-m message]
 
 update project from remote (pull) and (recursively) all followed submodules to sync with project
 
 If data needed is not cached, prompt user that data needs to be downloaded (override prompt with -y or -yy)
 
 If untracked data will be clobbered, prompt user (override prompt with -yy)
+
+If no message is provided, one will be conjured up for you
 
 * save
 
@@ -51,3 +53,7 @@ No diffs, fast-forward, merge commit (if up'd), conflict (if saved)
 
 For all submodules recursively
 
+* subsume folder1 [, folder2][, ...]
+
+Convert folders into submodules.  If folder is already tracked, remove from root repo.
+Create remote
