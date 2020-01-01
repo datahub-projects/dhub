@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+from run_git import git
 
 print ("ver -- versioning for the masses")
 
+git("status")
