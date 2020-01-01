@@ -3,6 +3,7 @@ import  subprocess, time, os, sys
 MAXLINES=100
 
 def run(*args, **kw):
+    # print ("DBG", args, kw)
     if 'showoutput' in kw:
         showoutput = kw['showoutput']
         print("showoutput:", showoutput)
