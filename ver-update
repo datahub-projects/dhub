@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 import argparse
-from utils import git
+from utils import *
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
 print ("ver -- Versioning Easily Remembered")
+
+subs = get_subs()
 
 out, good = git("reset", show=False, debug=args.debug)
 if out.find("Unstaged changes after reset") == 0:
