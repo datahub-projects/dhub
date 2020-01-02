@@ -6,7 +6,7 @@ def run(*args, **kw):
     # print ("DBG", args, kw)
     if 'showoutput' in kw:
         showoutput = kw['showoutput']
-        print("showoutput:", showoutput)
+        # print("showoutput:", showoutput)
         del kw['showoutput']
     else:
         showoutput = False
