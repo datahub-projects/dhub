@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import argparse
-from run_git import git
-from grep import grep
+from utils import git
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--debug', action="store_true")
