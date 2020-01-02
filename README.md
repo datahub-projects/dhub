@@ -23,7 +23,7 @@ If data needed is not cached, prompt user that data needs to be downloaded (over
 
 Print a list of all untracked files and folders, recursively in all submodules
 
-* up [commit|branch] [-m message]
+* update [commit|branch] [-m message]
 
 update project from remote (pull) and (recursively) all followed submodules to sync with project
 
@@ -49,7 +49,7 @@ If no subs specified, show user a list and prompt for which ones to clone & foll
 
 Report status of working tree vs latest on remote (or branch, commit)
 
-No diffs, fast-forward, merge commit (if up'd), conflict (if saved)
+No diffs, fast-forward, merge commit (if update'd), conflict (if saved)
 
 For all submodules recursively
 

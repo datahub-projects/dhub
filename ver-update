@@ -1,0 +1,7 @@
+#!/usr/bin/python3
+from run_git import git
+from grep import grep
+
+print ("ver -- Versioning Easily Remembered")
+
+out, good = git("submodule update", show=True)
