@@ -1,7 +1,12 @@
 #!/usr/bin/python3
+import argparse
 from run_git import git
 from grep import grep
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--debug', action="store_true")
+args = parser.parse_args()
+
 print ("ver -- Versioning Easily Remembered")
 
-out, good = git("submodule update", show=True)
+out, good = git("submodule update", show=True, debug=args.debug)
