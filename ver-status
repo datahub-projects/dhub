@@ -15,9 +15,11 @@ untracked = []
 for r in out.split("\n"):
     if r.find("\tmodified:") == 0:
         ret += r.strip() + "\n"
+    elif r.find("\tdeleted:") == 0:
+        ret += r.strip() + "\n"
     elif r.find("\tnew file:") == 0:
         ret += r.strip() + "\n"
     elif r.find("\t") == 0:
         untracked.append(r.strip())
 print (ret, end="")
-print("%d untracked item%s" % (len(untracked), "s:" if len(untracked)>1 else ":" if len(untracked)==1 else ""), " ", ", ".join(untracked))
+print("%d untracked item%s" % (len(untracked), "s:" if len(untracked)>1 else ":" if len(untracked)==1 else "s"), " ", ", ".join(untracked))
