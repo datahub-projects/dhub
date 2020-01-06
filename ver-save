@@ -9,14 +9,16 @@ args = parser.parse_args()
 
 print ("ver -- Versioning Easily Remembered")
 
-def save(local=False, debug=False):
+def save(local=False, debug=False, root=True):
     subs = get_subs()
     for sub in subs:
         print ("Processing", sub[0])
         path = os.path.abspath(".")
         os.chdir(sub[0])
-        save(local=local, debug=debug)
+        save(local=local, debug=debug, root=False)
         os.chdir(path)
+    if root:
+        print("Processing root project in", os.path.abspath("."))
     if not local:
         git("fetch", show=debug, debug=debug)
         git("merge --no-edit FETCH_HEAD", show=True, debug=debug)
@@ -26,5 +28,4 @@ def save(local=False, debug=False):
         git("push", show=True, debug=debug)
 
 chdir_root()
-print ("Processing root project in", os.path.abspath("."))
 save(local=args.local, debug=args.debug)
