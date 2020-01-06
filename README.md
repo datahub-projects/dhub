@@ -23,21 +23,21 @@ If data needed is not cached, prompt user that data needs to be downloaded (over
 
 Print a list of all untracked files and folders, recursively in all submodules
 
-* update [commit|branch] [-m message]
+* update [commit|branch]
 
-update project from remote (pull) and (recursively) all followed submodules to sync with project
+update root from remote (pull) and (recursively) all followed submodules to sync 
+with root
 
-If data needed is not cached, prompt user that data needs to be downloaded (override prompt with -y or -yy)
+submodules will be pulled from their respective remotes, but local branch name will
+be same as root project
 
-If untracked data will be clobbered, prompt user (override prompt with -yy)
-
-If no message is provided, one will be conjured up for you
-
-* save
+* save [-m message]
 
 push main project and (recursively) all subprojects to respective remotes
 
 Prompt user if there will be a significant amount of data to upload (override prompt with -y)
+
+If no message is provided, one will be conjured up for you
 
 * clone <remmote> [sub1[, sub2]]
 

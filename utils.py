@@ -20,6 +20,11 @@ def get_subs():
     subs = []
     for r in out.split("\n"):
         if r.strip():
-            sub = r.split()[1]
+            sub = r.split()[:1]
+            sub.reverse()
             subs.append(sub)
     return subs
+
+def get_branch():
+    out, err = git("git rev-parse --abbrev-ref HEAD")
+    return out
