@@ -18,8 +18,9 @@ def update(branch, prompt=True, debug=False):
             out, err = git("checkout --track origin/%s" % branch, show=debug, debug=debug)   # create it
             if out.find("fatal: ") == 0:                    # new remote
                 if not prompt or input("branch %s does not exist, create?" % branch).lower()[:1] == 'y':
-                    print ("creating new local & remote branch: %s" % branch)
+                    print ("creating new branch: & tracking remote: %s" % branch)
                     git("checkout -b {0}".format(branch), show=True, debug=debug)
+                    git("branch --set-upstream-to=origin/{0} {0}".format(branch))
                     # git("push -u origin {0}".format(branch), show=True, debug=debug) # done on 'save'
     else:
         branch = curbr
