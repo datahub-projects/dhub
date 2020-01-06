@@ -3,14 +3,21 @@ import os, sys, argparse
 from utils import *
 
 parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('branch')
 parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
 print ("ver -- Versioning Easily Remembered")
 
-def update():
-    branch = get_branch()
+def update(branch):
     out, good = git("pull", show=True, debug=args.debug)
+    curbr = get_branch()
+    if branch and curbr != branch:
+        out, err = git("checkout %s" % branch)
+        if out.find("error: pathspec") == 0:  # if branch does not exist,
+            out, err = git("checkout -b %s" % branch)  # create it
+    else:
+        branch = curbr
     subs = get_subs()
     for sub in subs:
         print ("Processing", sub)
@@ -18,17 +25,11 @@ def update():
         os.chdir(sub[0])
         # os.system("pwd")
         git("fetch")                                            #could be slow -- prompt user?
-        subbr = get_branch()
-        if subbr != branch:
-            out, err = git("checkout %s" % branch)
-            if out.find("error: pathspec") == 0:                #if branch does not exist,
-                out, err = git("checkout -b %s" % branch)       #create it
-
-        update()
+        update(branch)
         os.chdir(path)
         if subs:
             git("submodule update", show=True)
 
 print ("Processing root project")
-update()
+update(args.branch)
 
