@@ -20,8 +20,9 @@ def get_subs():
     subs = []
     for r in out.split("\n"):
         if r.strip():
-            sub = r.split()[:1]
+            sub = r.split()[:2]
             sub.reverse()
+            sub[1] = sub[1].replace("+", "").replace("-", "")
             subs.append(sub)
     return subs
 
