@@ -1,3 +1,4 @@
+import os
 from run import run
 #
 # run a git command, capture the output
@@ -27,5 +28,23 @@ def get_subs():
     return subs
 
 def get_branch():
-    out, err = git("git rev-parse --abbrev-ref HEAD")
+    out, err = git("rev-parse --abbrev-ref HEAD")
     return out
+
+def chdir_root():
+    opath = os.path.abspath(".")
+    cur = opath
+    top = None
+    while True:
+        if os.path.exists(".git"):
+            top = cur
+        os.chdir("..")
+        up1 = os.path.abspath(".")
+        if up1 == cur:
+            break
+        cur = up1
+    if top:
+        os.chdir(top)
+    else:
+        print ("Not a ver path")
+        os.chdir(opath)
