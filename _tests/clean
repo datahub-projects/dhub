@@ -1,0 +1,27 @@
+#!/bin/bash
+rm -fr rootbare rooty myroot sub1bare
+
+mkdir rootbare sub1bare rooty
+
+cd rootbare
+git init --bare
+
+cd ../sub1bare
+git init --bare
+
+cd ../rooty
+git init
+
+mkdir sub1
+cd sub1
+git init
+echo "rooty/sub1" > rooty_file1
+git add rooty_file1
+git commit -am "rooty/rooty_file1 commit 1 (sub1)"
+git push ../../sub1bare master
+
+cd ../
+git submodule add ../sub1bare sub1
+git submodule update --init
+git commit -am "rooty/rooty_file1 commit 1 (rooty)"
+git push ../rootbare master
