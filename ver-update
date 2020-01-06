@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os, sys, argparse
-from utils import *
+from ver_utils import *
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('branch', nargs='?')
@@ -36,6 +36,7 @@ def update(branch, prompt=True, debug=False):
     if subs:
         git("submodule update", show=True, debug=debug)
 
+chdir_root()
 print ("Processing root project")
 update(args.branch, prompt=True, debug=args.debug)
 

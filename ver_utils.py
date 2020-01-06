@@ -1,5 +1,5 @@
 import os
-from run import run
+from ver_run import run
 #
 # run a git command, capture the output
 #

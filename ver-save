@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os, sys, argparse
-from utils import *
+from ver_utils import *
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--local', action="store_true")
@@ -21,7 +21,7 @@ def save(local=False, debug=False):
         git("fetch", show=debug, debug=debug)
         git("merge --no-edit FETCH_HEAD", show=True, debug=debug)
     git("add .", show=debug, debug=debug)
-    git("commit -m 'ver commit'", show=debug, debug=debug)
+    git(["commit", "-m", '"ver commit"'], show=debug, debug=debug)
     if not local:
         git("push", show=True, debug=debug)
 
