@@ -24,6 +24,12 @@ os.chdir(branch)
 
 git("submodule update --init", show=args.debug, debug=args.debug)
 
+subs = get_subs()
+for sub in subs:
+    path = os.path.abspath(".")
+    os.chdir(sub[0])
+    git("checkout master", show=args.debug, debug=args.debug)
+
 cmd = ["ver-update", "--yes"]
 if args.debug:
     cmd.append("--debug")
