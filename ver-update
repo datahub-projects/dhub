@@ -4,22 +4,13 @@ from ver_utils import *
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('branch', nargs='?')
-parser.add_argument('--name', default="")
+parser.add_argument('--yes', action="store_true")
 parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
-print ("ver -- Versioning Easily Remembered")
+print ("ver -- Ver Exhibits Recursion")
 
-def update(branch, name="", prompt=True, debug=False):
-    if "/" in branch:
-        git("clone %s %s" % (branch, name), show=True, debug=debug)
-        if name:
-            branch = name
-        else:
-            if branch[-1] == "/":
-                branch = branch[:-1]
-            j = branch.rfind("/")
-            branch = branch[j+1:]
+def update(branch, prompt=True, debug=False):
     git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
     curbr = get_branch()
     if branch and (curbr != branch):
@@ -49,5 +40,4 @@ def update(branch, name="", prompt=True, debug=False):
 
 chdir_root()
 print ("Processing root project")
-update(args.branch, name=args.name, prompt=True, debug=args.debug)
-
+update(args.branch, prompt=not args.yes, debug=args.debug)

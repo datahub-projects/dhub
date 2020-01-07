@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+import os, sys, argparse
+from ver_utils import *
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('remote')
+parser.add_argument('--name', default="")
+parser.add_argument('--debug', action="store_true")
+args = parser.parse_args()
+
+print ("ver -- Versioning Easily Remembered")
+
+git("clone %s %s" % (args.remote, args.name), show=True, debug=args.debug)
+
+if args.name:
+    branch = args.name
+else:
+    if args.remote[-1] == "/":
+        branch = args.remote[:-1]
+    j = branch.rfind("/")
+    branch = branch[j+1:]
+
+os.chdir(branch)
+
+git("submodule update --init", show=args.debug, debug=args.debug)
+
+cmd = ["ver-update", "--yes"]
+if args.debug:
+    cmd.append("--debug")
+if args.debug:
+    print(cmd)
+run(cmd, showoutput=True)
