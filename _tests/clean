@@ -12,17 +12,19 @@ git init --bare
 cd ../rooty
 git init
 echo "This represents the root ver project. Please only have one in the path!" > .ver_root
+git remote add origin ~/ver/_tests/rootbare
 
 mkdir sub1
 cd sub1
 git init
+git remote add origin ~/ver/_tests/sub1bare
 echo "rooty/sub1" > rooty_file1
 git add rooty_file1
 git commit -am "rooty/rooty_file1 commit 1 (sub1)"
-git push ../../sub1bare master
+git push
 
 cd ../
-git submodule add ../sub1bare sub1
+git submodule add ~/ver_tests/rooty/sub1
 git submodule update --init
 git commit -am "rooty/rooty_file1 commit 1 (rooty)"
 git push ../rootbare master
