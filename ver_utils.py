@@ -38,6 +38,9 @@ def chdir_root():
     cur = opath
     top = None
     while True:
+        if os.path.exists(".ver_root"):
+            top = cur
+            break
         if os.path.exists(".git"):
             top = cur
         os.chdir("..")
