@@ -21,6 +21,9 @@ else:
     branch = branch[j+1:]
 
 os.chdir(branch)
+f = open(".ver_root", "w")
+f.write("This represents the root ver project. Please only have one in the path!")
+f.close()
 
 git("submodule update --init", show=args.debug, debug=args.debug)
 

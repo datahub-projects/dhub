@@ -11,6 +11,7 @@ git init --bare
 
 cd ../rooty
 git init
+echo "This represents the root ver project. Please only have one in the path!" > .ver_root
 
 mkdir sub1
 cd sub1
