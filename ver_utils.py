@@ -41,8 +41,6 @@ def chdir_root():
         if os.path.exists(".ver_root"):
             top = cur
             break
-        if os.path.exists(".git"):
-            top = cur
         os.chdir("..")
         up1 = os.path.abspath(".")
         if up1 == cur:
@@ -51,5 +49,6 @@ def chdir_root():
     if top:
         os.chdir(top)
     else:
-        print ("Not a ver path")
+        print ("Not a ver project")
         os.chdir(opath)
+        raise Exception("ERROR -- not a ver project")
