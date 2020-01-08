@@ -21,10 +21,10 @@ git remote add origin ~/ver/_tests/sub1bare
 echo "rooty/sub1" > rooty_file1
 git add rooty_file1
 git commit -am "rooty/rooty_file1 commit 1 (sub1)"
-git push
+git push --set-upstream origin master
 
 cd ../
-git submodule add ~/ver_tests/rooty/sub1
+git submodule add ~/ver/_tests/rooty/sub1
 git submodule update --init
 git commit -am "rooty/rooty_file1 commit 1 (rooty)"
-git push ../rootbare master
+git push --set-upstream origin master

@@ -33,6 +33,20 @@ def get_branch():
     out, err = git("rev-parse --abbrev-ref HEAD")
     return out
 
+def is_ver_project():
+    opath = os.path.abspath(".")
+    cur = opath
+    while True:
+        if os.path.exists(".ver_root"):
+            os.chdir(opath)
+            return True
+        os.chdir("..")
+        up1 = os.path.abspath(".")
+        if up1 == cur:
+            os.chdir(opath)
+            return False
+        cur = up1
+
 def chdir_root():
     opath = os.path.abspath(".")
     cur = opath

@@ -9,6 +9,9 @@ parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
 print ("ver -- Versioning Easily Remembered")
+if is_ver_project():
+    print ("ERROR -- can't get a new project within an existing one")
+    exit()
 
 git("clone %s %s" % (args.remote, args.name), show=True, debug=args.debug)
 
@@ -28,6 +31,9 @@ f.close()
 git("submodule update --init", show=args.debug, debug=args.debug)
 
 subs = get_subs()
+print (subs)
+exit()
+
 for sub in subs:
     path = os.path.abspath(".")
     os.chdir(sub[0])

@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+import os
+from ver_utils import *
+print (is_ver_project())
 
 print ("ver -- versioning for the masses\nversion 0.0.1")
+
 
