@@ -1,5 +1,5 @@
 #!/bin/bash
-rm -fr rootbare rooty myroot sub1bare
+rm -fr root* *bare my*
 
 mkdir rootbare sub1bare rooty
 

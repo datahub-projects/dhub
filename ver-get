@@ -31,8 +31,6 @@ f.close()
 git("submodule update --init", show=args.debug, debug=args.debug)
 
 subs = get_subs()
-print (subs)
-exit()
 
 for sub in subs:
     path = os.path.abspath(".")
