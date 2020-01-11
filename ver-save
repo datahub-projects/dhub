@@ -2,12 +2,6 @@
 import os, sys, argparse
 from ver_utils import *
 
-parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--local', action="store_true")
-parser.add_argument('--debug', action="store_true")
-args = parser.parse_args()
-
-print ("ver -- Versioning Easily Remembered")
 
 def save(local=False, debug=False, root=True):
     subs = get_subs()
@@ -27,5 +21,11 @@ def save(local=False, debug=False, root=True):
     if not local:
         git("push", show=True, debug=debug)
 
-chdir_root()
-save(local=args.local, debug=args.debug)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--debug', action="store_true")
+    args = parser.parse_args()
+
+    print ("ver -- Versioning Easily Remembered")
+    chdir_root()
+    save(local=False, debug=args.debug)
