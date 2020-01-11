@@ -5,6 +5,7 @@ from ver_utils import *
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('remote')
 parser.add_argument('--name', default="")
+parser.add_argument('--subs', default="")
 parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
@@ -28,20 +29,21 @@ f = open(".ver_root", "w")
 f.write("This represents the root ver project. Please only have one in the path!")
 f.close()
 
-git("submodule update --init", show=args.debug, debug=args.debug)
+path = os.path.abspath(".")
+subs = args.subs.split(",")
+for sub, commit in get_subs():
+    if sub in subs:
+        print ("including: ", sub)
+        os.chdir(sub)
+        git("submodule update --init .", show=args.debug, debug=args.debug)
+        git("checkout master", show=args.debug, debug=args.debug)
+    else:
+        print ("ignoring:  ", sub)
+    os.chdir(path)
 
-subs = get_subs()
-print (subs)
-exit()
-
-for sub in subs:
-    path = os.path.abspath(".")
-    os.chdir(sub[0])
-    git("checkout master", show=args.debug, debug=args.debug)
-
-cmd = ["ver-update", "--yes"]
-if args.debug:
-    cmd.append("--debug")
-if args.debug:
-    print(cmd)
-run(cmd, showoutput=True)
+# cmd = ["ver-update", "--yes"]
+# if args.debug:
+#     cmd.append("--debug")
+# if args.debug:
+#     print(cmd)
+# run(cmd, showoutput=True)
