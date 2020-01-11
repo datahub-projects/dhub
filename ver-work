@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os, sys, argparse
 from ver_utils import *
+from ver_pull import update
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('remote')
@@ -37,13 +38,7 @@ for sub, commit in get_subs():
         os.chdir(sub)
         git("submodule update --init .", show=args.debug, debug=args.debug)
         git("checkout master", show=args.debug, debug=args.debug)
+        update("master", prompt=False, debug=args.debug)
     else:
         print ("ignoring:  ", sub)
     os.chdir(path)
-
-# cmd = ["ver-update", "--yes"]
-# if args.debug:
-#     cmd.append("--debug")
-# if args.debug:
-#     print(cmd)
-# run(cmd, showoutput=True)

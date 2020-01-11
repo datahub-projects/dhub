@@ -2,14 +2,6 @@
 import os, sys, argparse
 from ver_utils import *
 
-parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('branch', nargs='?')
-parser.add_argument('--yes', action="store_true")
-parser.add_argument('--debug', action="store_true")
-args = parser.parse_args()
-
-print ("ver -- Ver Exhibits Recursion")
-
 def update(branch, prompt=True, debug=False):
     git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
     curbr = get_branch()
@@ -38,6 +30,15 @@ def update(branch, prompt=True, debug=False):
     if subs:
         git("submodule update", show=True, debug=debug)
 
-chdir_root()
-print ("Processing root project")
-update(args.branch, prompt=not args.yes, debug=args.debug)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('branch', nargs='?')
+    parser.add_argument('--yes', action="store_true")
+    parser.add_argument('--debug', action="store_true")
+    args = parser.parse_args()
+
+    print ("ver -- Ver Exhibits Recursion")
+
+    chdir_root()
+    print ("Processing root project")
+    update(args.branch, prompt=not args.yes, debug=args.debug)
