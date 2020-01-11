@@ -37,8 +37,12 @@ for sub, commit in get_subs():
         print ("including: ", sub)
         os.chdir(sub)
         git("submodule update --init .", show=args.debug, debug=args.debug)
+        commit = git("rev-parse HEAD")[0]
         git("checkout master", show=args.debug, debug=args.debug)
         update("master", prompt=False, debug=args.debug)
+        if args.debug:
+            print ("forcing %s master branch to %s" % (sub, commit))
+        git("reset --hard %s" % commit, show=args.debug, debug=args.debug)
     else:
         print ("ignoring:  ", sub)
     os.chdir(path)
