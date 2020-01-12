@@ -1,0 +1,8 @@
+#!/bin/bash
+rm -fr root* *bare my*
+
+./clean
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~TEST 1~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+ver clone ./rootbare --name myroot --yes
+ls -rlt myroot
