@@ -1,0 +1,60 @@
+#!/usr/bin/python3
+import os, sys, argparse
+from ver_utils import *
+from ver_pull import update
+
+def clone(url, name, subs):
+    out, err = git("clone %s %s" % (url, name), show=True, debug=args.debug)
+    if out.find('fatal') == 0:
+        print (out, file=sys.stderr)
+        return
+
+    if name:
+        branch = name
+    else:
+        if url[-1] == "/":
+            branch = url[:-1]
+        j = branch.rfind("/")
+        branch = branch[j+1:]
+
+    os.chdir(branch)
+    f = open(".ver_root", "w")
+    f.write("This represents the root ver project. Please only have one in the path!")
+    f.close()
+
+    path = os.path.abspath(".")
+    subs = subs.split(",")
+    for sub, commit in get_subs():
+        if sub in subs:
+            print ("including: ", sub)
+            os.chdir(sub)
+            git("submodule update --init .", show=args.debug, debug=args.debug)
+            commit = git("rev-parse HEAD")[0]
+            git("checkout master", show=args.debug, debug=args.debug)
+            update("master", prompt=False, debug=args.debug)
+            if args.debug:
+                print ("forcing %s master branch to %s" % (sub, commit))
+            git("reset --hard %s" % commit, show=args.debug, debug=args.debug)
+        else:
+            print ("ignoring:  ", sub)
+        os.chdir(path)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('cmd')
+    parser.add_argument('arg2', nargs='?')
+    parser.add_argument('--name', default="")
+    parser.add_argument('--subs', default="")
+    parser.add_argument('--debug', action="store_true")
+    args = parser.parse_args()
+
+    print ("ver -- Versioning Easily Remembered")
+    if is_ver_project():
+        print ("ERROR -- can't clone a new project within an existing one")
+        exit()
+
+    if args.cmd == 'clone':
+        clone(args.arg2, name=args.name, subs=args.subs)
+
+    else:
+        print ("Unknown ver command: %s" % args.cmd)

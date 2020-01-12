@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+import os, sys, argparse
+from ver_utils import *
+from ver_save import save
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--debug', action="store_true")
+    args = parser.parse_args()
+
+    print ("ver -- Versioning Easily Remembered")
+    chdir_root()
+    save(local=False, debug=args.debug)

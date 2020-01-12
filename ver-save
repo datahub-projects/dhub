@@ -28,4 +28,4 @@ if __name__ == "__main__":
 
     print ("ver -- Versioning Easily Remembered")
     chdir_root()
-    save(local=False, debug=args.debug)
+    save(local=True, debug=args.debug)
