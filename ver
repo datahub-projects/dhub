@@ -3,8 +3,9 @@ import os, sys, argparse
 from ver_utils import *
 from ver_pull import update
 
-def clone(url, name, subs):
-    out, err = git("clone %s %s" % (url, name), show=True, debug=args.debug)
+
+def clone(url, name, subs, debug):
+    out, err = git("clone %s %s" % (url, name), show=True, debug=debug)
     if out.find('fatal') == 0:
         print (out, file=sys.stderr)
         return
@@ -28,16 +29,74 @@ def clone(url, name, subs):
         if sub in subs:
             print ("including: ", sub)
             os.chdir(sub)
-            git("submodule update --init .", show=args.debug, debug=args.debug)
+            git("submodule update --init .", show=debug, debug=debug)
             commit = git("rev-parse HEAD")[0]
-            git("checkout master", show=args.debug, debug=args.debug)
-            update("master", prompt=False, debug=args.debug)
-            if args.debug:
+            git("checkout master", show=debug, debug=debug)
+            update("master", prompt=False, debug=debug)
+            if debug:
                 print ("forcing %s master branch to %s" % (sub, commit))
-            git("reset --hard %s" % commit, show=args.debug, debug=args.debug)
+            git("reset --hard %s" % commit, show=debug, debug=debug)
         else:
             print ("ignoring:  ", sub)
         os.chdir(path)
+
+
+def save(local=False, debug=False, root=True):
+    subs = get_subs()
+    for sub in subs:
+        print ("Processing", sub[0])
+        path = os.path.abspath(".")
+        os.chdir(sub[0])
+        save(local=local, debug=debug, root=False)
+        os.chdir(path)
+    if root:
+        print("Processing root project in", os.path.abspath("."))
+    if not local:
+        git("fetch", show=debug, debug=debug)
+        git("merge --no-edit FETCH_HEAD", show=True, debug=debug)
+    git("add .", show=debug, debug=debug)
+    git(["commit", "-m", '"ver commit"'], show=debug, debug=debug)
+    if not local:
+        git("push", show=True, debug=debug)
+
+
+def update(branch, prompt=True, debug=False):
+    git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
+    curbr = get_branch()
+    if branch and (curbr != branch):
+        out, err = git("checkout %s" % branch, show=debug, debug=debug)
+        if out.find("error: pathspec") == 0:                        # if branch does not exist,
+            out, err = git("checkout --track origin/%s" % branch, show=debug, debug=debug)   # create it
+            if out.find("fatal: ") == 0:                    # new remote
+                if not prompt or input("branch %s does not exist, create?" % branch).lower()[:1] == 'y':
+                    print ("creating new branch: & tracking remote: %s" % branch)
+                    git("checkout -b {0}".format(branch), show=True, debug=debug)
+                    git("push --set-upstream origin {0}".format(branch), show=debug, debug=debug)
+                    git("push", show=debug, debug=debug)
+    else:
+        branch = curbr
+
+    git("pull", show=True, debug=debug)
+    subs = get_subs()
+    for sub in subs:
+        print ("Processing", sub[0])
+        path = os.path.abspath(".")
+        os.chdir(sub[0])
+        # os.system("pwd")
+        update(branch, prompt=False, debug=debug)
+        os.chdir(path)
+    if subs:
+        git("submodule update", show=True, debug=debug)
+
+
+def merge(branch, debug=False):
+    save(local=False, debug=args.debug)
+    git("pull origin %s" % branch, show=debug, debug=debug)
+    git("push origin %s" % branch, show=debug, debug=debug)
+    update(branch=args.arg2, debug=args.debug)
+    if input("Delete branch %s?" % branch).lower()[:1] == 'y':
+        git("push origin --delete %s" % branch, show=debug, debug=debug)
+        git("branch -D %s" % branch, show=debug, debug=debug)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -54,7 +113,17 @@ if __name__ == "__main__":
         exit()
 
     if args.cmd == 'clone':
-        clone(args.arg2, name=args.name, subs=args.subs)
+        clone(url=args.arg2, name=args.name, subs=args.subs, debug=args.debug)
+
+    elif args.cmd == 'save':
+        save(local=True, debug=args.debug)
+
+    elif args.cmd == 'sync':
+        save(local=False, debug=args.debug)
+
+    elif args.cmd == 'branch':
+        save(local=False, debug=args.debug)
+        update(branch=args.arg2, debug=args.debug)
 
     else:
         print ("Unknown ver command: %s" % args.cmd)
