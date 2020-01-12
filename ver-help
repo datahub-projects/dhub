@@ -1,8 +1,0 @@
-#!/usr/bin/python3
-import os
-
-os.chdir(__file__[:__file__.rfind("/")])
-f = open("README.md")
-print(f.read().replace("\n\n", "\n").replace("*", "\n*"))
-f.close()
-

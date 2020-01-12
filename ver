@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os, sys, argparse
 from ver_utils import *
-from ver_pull import update
 
 
 def clone(url, name, subs, debug):
@@ -90,13 +89,34 @@ def update(branch, prompt=True, debug=False):
 
 
 def merge(branch, debug=False):
-    save(local=False, debug=args.debug)
+    save(local=False, debug=debug)
     git("pull origin %s" % branch, show=debug, debug=debug)
     git("push origin %s" % branch, show=debug, debug=debug)
-    update(branch=args.arg2, debug=args.debug)
+    update(branch=arg2, debug=debug)
     if input("Delete branch %s?" % branch).lower()[:1] == 'y':
         git("push origin --delete %s" % branch, show=debug, debug=debug)
         git("branch -D %s" % branch, show=debug, debug=debug)
+
+
+def status(debug=False):
+    out, good = git("status", show=debug, debug=debug)
+    ret = ""
+    untracked = []
+    for r in out.split("\n"):
+        if r.find("\tmodified:") == 0:
+            ret += r.strip() + "\n"
+        elif r.find("\tdeleted:") == 0:
+            ret += r.strip() + "\n"
+        elif r.find("\tnew file:") == 0:
+            ret += r.strip() + "\n"
+        elif r.find("\trenamed:") == 0:
+            ret += r.strip() + "\n"
+        elif r.find("\t") == 0:
+            untracked.append(r.strip())
+    print(ret, end="")
+    print("%d untracked item%s" % (len(untracked), "s:" if len(untracked) > 1 else ":" if len(untracked) == 1 else "s"),
+          " ", ", ".join(untracked))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -124,6 +144,9 @@ if __name__ == "__main__":
     elif args.cmd == 'branch':
         save(local=False, debug=args.debug)
         update(branch=args.arg2, debug=args.debug)
+
+    elif args.cmd == 'status':
+        status(args.debug)
 
     else:
         print ("Unknown ver command: %s" % args.cmd)
