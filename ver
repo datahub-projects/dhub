@@ -133,7 +133,14 @@ if __name__ == "__main__":
         exit()
 
     if args.cmd == 'clone':
-        clone(url=args.arg2, name=args.name, subs=args.subs, debug=args.debug)
+        if is_ver_project():
+            print("ERROR -- can't clone a new project within an existing one")
+        else:
+            clone(url=args.arg2, name=args.name, subs=args.subs, debug=args.debug)
+
+    elif not is_ver_project():
+        print("ERROR -- not a ver project")
+        exit()
 
     elif args.cmd == 'save':
         save(local=True, debug=args.debug)
