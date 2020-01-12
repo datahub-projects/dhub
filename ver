@@ -89,13 +89,27 @@ def update(branch, prompt=True, debug=False):
 
 
 def merge(branch, debug=False):
+    if not branch:
+        branch = 'master'
+    oldbr = get_branch()
     save(local=False, debug=debug)
     git("pull origin %s" % branch, show=debug, debug=debug)
-    git("push origin %s" % branch, show=debug, debug=debug)
-    update(branch=arg2, debug=debug)
-    if input("Delete branch %s?" % branch).lower()[:1] == 'y':
-        git("push origin --delete %s" % branch, show=debug, debug=debug)
+    update(branch=oldbr, debug=debug)
+    git("checkout %s" % branch)
+    git("pull origin %s" % oldbr, show=debug, debug=debug)
+    update(branch=branch, debug=debug)
+    if input("Delete branch %s?" % oldbr).lower()[:1] == 'y':
+        git("push origin --delete %s" % oldbr, show=debug, debug=debug)
         git("branch -D %s" % branch, show=debug, debug=debug)
+
+
+def pull(branch, debug=False):
+    if not branch:
+        branch = 'master'
+    oldbr = get_branch()
+    save(local=False, debug=debug)
+    git("pull origin %s" % branch, show=debug, debug=debug)
+    update(branch=oldbr, debug=debug)
 
 
 def status(debug=False):
@@ -148,6 +162,12 @@ if __name__ == "__main__":
     elif args.cmd == 'sync':
         save(local=False, debug=args.debug)
 
+    elif args.cmd == 'merge':
+        merge(branch=args.arg2, debug=args.debug)
+
+    elif args.cmd == 'pull':
+        save(local=False, debug=args.debug)
+
     elif args.cmd == 'branch':
         save(local=False, debug=args.debug)
         update(branch=args.arg2, debug=args.debug)
@@ -157,3 +177,4 @@ if __name__ == "__main__":
 
     else:
         print ("Unknown ver command: %s" % args.cmd)
+    
