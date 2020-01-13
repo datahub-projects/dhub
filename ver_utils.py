@@ -1,12 +1,17 @@
 import os
 from ver_run import run
-from colorama import Fore as F
+from blessings import Terminal
+bless_term = Terminal()
+
+
+def print_red(s, **kw):
+    print (bless_term.red(s), **kw)
 #
 # run a git command, capture the output
 #
 def git(cmd, show=False, debug=False):
     if debug:
-        print ("%sgit %s%s" % (F.RED, cmd, F.BLACK))
+        print_red ("git %s" % cmd)
     if hasattr(cmd, "lower"):
         cmd = cmd.split()
     out, good = run(["git"] + cmd, showoutput=show)
