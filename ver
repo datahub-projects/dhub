@@ -119,6 +119,10 @@ def pull(branch, debug=False):
 
 
 def status(debug=False):
+    out, good = git("branch", show=debug, debug=debug)
+    for n in out.split("\n"):
+        if n[:1] == '*':
+            print ("On branch: %s" % n[2:])
     out, good = git("status", show=debug, debug=debug)
     ret = ""
     untracked = []
