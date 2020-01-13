@@ -6,3 +6,12 @@ rm -fr root* *bare my*
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~TEST 1~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 ver clone ./rootbare --name myroot --yes
 ls -Rrlt myroot
+cd myroot
+ver branch b1 --yes --debug
+ver branch --debug
+cat "To another end" > sub1/rooty_file2
+ver sync
+ver branch master --debug
+ver branch --debug
+cd sub1
+git branch
