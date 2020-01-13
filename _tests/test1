@@ -5,4 +5,4 @@ rm -fr root* *bare my*
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~TEST 1~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 ver clone ./rootbare --name myroot --yes
-ls -rlt myroot
+ls -Rrlt myroot

@@ -149,11 +149,7 @@ if __name__ == "__main__":
     parser.add_argument('--no', action="store_true")
     args = parser.parse_args()
     answer = True if args.yes else False if args.no else None    #None means prompt user
-
     print ("ver -- Versioning Easily Remembered")
-    if is_ver_project():
-        print ("ERROR -- can't clone a new project within an existing one")
-        exit()
 
     if args.cmd == 'clone':
         if is_ver_project():
