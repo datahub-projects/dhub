@@ -12,12 +12,12 @@ git init --bare
 cd ../rooty
 git init
 echo "This represents the root ver project. Please only have one in the path!" > .ver_root
-git remote add origin ~/ver/_tests/rootbare
+git remote add origin $PWD/../../_tests/rootbare
 
 mkdir sub1
 cd sub1
 git init
-git remote add origin ~/ver/_tests/sub1bare
+git remote add origin $PWD/../../../_tests/sub1bare
 echo "rooty/sub1" > rooty_file1
 git add rooty_file1
 git commit -am "rooty/rooty_file1 commit 1 (sub1)"
