@@ -1,9 +1,16 @@
 #!/usr/bin/python3
 import os, sys, argparse
 from ver_utils import *
+from blessings import Terminal
+bless_term = Terminal()
 
+
+def print_green(s, **kw):
+    print (bless_term.green(s), **kw)
 
 def clone(url, name, subs, debug, answer=None):
+    if debug:
+        print_green("clone(url=%s, name=%s, subs=%s, answer=%s)" % (url, name, subs, answer))
     print ("DBG-->%s<--" % subs)
     out, err = git("clone %s %s" % (url, name), show=True, debug=debug)
     if out.find('fatal') == 0:
@@ -47,6 +54,8 @@ def clone(url, name, subs, debug, answer=None):
 
 
 def save(local=False, debug=False, root=True):
+    if debug:
+        print_green("save(local=%s, root=%s)" % (local, root))
     subs = get_subs()
     for sub in subs:
         print ("Processing", sub[0])
@@ -66,6 +75,8 @@ def save(local=False, debug=False, root=True):
 
 
 def update(branch, answer=None, debug=False):
+    if debug:
+        print_green("update(branch, answer=%s)" % (branch, answer))
     git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
     curbr = get_branch()
     if branch and (curbr != branch):
@@ -83,18 +94,20 @@ def update(branch, answer=None, debug=False):
 
     git("pull", show=True, debug=debug)
     subs = get_subs()
-    for sub in subs:
-        print ("Processing", sub[0])
-        path = os.path.abspath(".")
-        os.chdir(sub[0])
-        # os.system("pwd")
-        update(branch, answer=False, debug=debug)
-        os.chdir(path)
     if subs:
         git("submodule update", show=True, debug=debug)
+        for sub in subs:
+            print ("Processing", sub[0])
+            path = os.path.abspath(".")
+            os.chdir(sub[0])
+            # os.system("pwd")
+            update(branch, answer=False, debug=debug)
+            os.chdir(path)
 
 
 def merge(branch, debug=False):
+    if debug:
+        print_green("merge(branch=%s)" % (branch))
     if not branch:
         branch = 'master'
     oldbr = get_branch()
@@ -110,6 +123,8 @@ def merge(branch, debug=False):
 
 
 def pull(branch, debug=False):
+    if debug:
+        print_green("pull(branch=%s)" % (branch))
     if not branch:
         branch = 'master'
     oldbr = get_branch()
@@ -119,6 +134,8 @@ def pull(branch, debug=False):
 
 
 def status(debug=False):
+    if debug:
+        print_green("status()")
     out, good = git("branch", show=debug, debug=debug)
     for n in out.split("\n"):
         if n[:1] == '*':
