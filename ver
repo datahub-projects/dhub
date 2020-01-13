@@ -11,7 +11,6 @@ def print_green(s, **kw):
 def clone(url, name, subs, debug, answer=None):
     if debug:
         print_green("clone(url=%s, name=%s, subs=%s, answer=%s)" % (url, name, subs, answer))
-    print ("DBG-->%s<--" % subs)
     out, err = git("clone %s %s" % (url, name), show=True, debug=debug)
     if out.find('fatal') == 0:
         print (out, file=sys.stderr)
@@ -76,7 +75,7 @@ def save(local=False, debug=False, root=True):
 
 def update(branch, answer=None, debug=False):
     if debug:
-        print_green("update(branch, answer=%s)" % (branch, answer))
+        print_green("update(branch=%s, answer=%s)" % (branch, answer))
     git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
     curbr = get_branch()
     if branch and (curbr != branch):
@@ -181,29 +180,31 @@ if __name__ == "__main__":
     elif not is_ver_project():
         print("ERROR -- not a ver project")
         exit()
-
-    elif args.cmd == 'save':
-        save(local=True, debug=args.debug)
-
-    elif args.cmd == 'sync':
-        save(local=False, debug=args.debug)
-
-    elif args.cmd == 'merge':
-        merge(branch=args.arg2, debug=args.debug)
-
-    elif args.cmd == 'pull':
-        save(local=False, debug=args.debug)
-
-    elif args.cmd == 'branch':
-        if not args.arg2:
-            print ("Here are all the branches:")
-            git("branch", show=True, debug=args.debug)
-        else:
-            save(local=False, debug=args.debug)
-            update(branch=args.arg2, debug=args.debug, answer=answer)
-
-    elif args.cmd == 'status':
-        status(args.debug)
-
     else:
-        print ("Unknown ver command: %s" % args.cmd)
+        chdir_root()
+
+        if args.cmd == 'save':
+            save(local=True, debug=args.debug)
+
+        elif args.cmd == 'sync':
+            save(local=False, debug=args.debug)
+
+        elif args.cmd == 'merge':
+            merge(branch=args.arg2, debug=args.debug)
+
+        elif args.cmd == 'pull':
+            save(local=False, debug=args.debug)
+
+        elif args.cmd == 'branch':
+            if not args.arg2:
+                print ("Here are all the branches:")
+                git("branch", show=True, debug=args.debug)
+            else:
+                save(local=False, debug=args.debug)
+                update(branch=args.arg2, debug=args.debug, answer=answer)
+
+        elif args.cmd == 'status':
+            status(args.debug)
+
+        else:
+            print ("Unknown ver command: %s" % args.cmd)
