@@ -157,6 +157,16 @@ def status(debug=False):
     print("%d untracked item%s" % (len(untracked), "s:" if len(untracked) > 1 else ":" if len(untracked) == 1 else "s"),
           " ", ", ".join(untracked))
 
+    print ("Submodules:")
+    curbr = get_branch()
+    subs = get_subs()
+    for sub in subs:
+        path = os.path.abspath(".")
+        os.chdir(sub[0])
+        subbr = get_branch()
+        print ("  %s(%s) is on branch %s %s" % (sub[0], sub[1][:6], subbr, "" if subbr==curbr else "UNSYNCED" ))
+        os.chdir(path)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

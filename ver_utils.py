@@ -37,7 +37,7 @@ def get_subs():
 
 def get_branch():
     out, err = git("rev-parse --abbrev-ref HEAD")
-    return out
+    return out.strip()
 
 def is_ver_project():
     opath = os.path.abspath(".")
