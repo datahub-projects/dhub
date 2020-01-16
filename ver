@@ -57,26 +57,27 @@ def save(local=False, debug=False, root=True):
         print_green("save(local=%s, root=%s)" % (local, root))
     subs = get_subs()
     for sub in subs:
-        print ("Processing", sub[0])
+        if debug:
+            print ("Processing", sub[0])
         path = os.path.abspath(".")
         os.chdir(sub[0])
         save(local=local, debug=debug, root=False)
         os.chdir(path)
-    if root:
+    if debug and root:
         print("Processing root project in", os.path.abspath("."))
     if not local:
         git("fetch", show=debug, debug=debug)
-        git("merge --no-edit FETCH_HEAD", show=True, debug=debug)
+        git("merge --no-edit FETCH_HEAD", show=debug, debug=debug)
     git("add .", show=debug, debug=debug)
     git(["commit", "-m", '"ver commit"'], show=debug, debug=debug)
     if not local:
-        git("push", show=True, debug=debug)
+        git("push", show=debug, debug=debug)
 
 
 def update(branch, answer=None, debug=False):
     if debug:
         print_green("update(branch=%s, answer=%s)" % (branch, answer))
-    git("fetch", show=True, debug=debug)  # could be slow -- prompt user?
+    git("fetch", show=debug, debug=debug)  # could be slow -- prompt user?
     curbr = get_branch()
     if branch and (curbr != branch):
         out, err = git("checkout %s" % branch, show=debug, debug=debug)
@@ -89,18 +90,19 @@ def update(branch, answer=None, debug=False):
                         return
                 if answer:
                     print ("creating new branch: & tracking remote: %s" % branch)
-                    git("checkout -b {0}".format(branch), show=True, debug=debug)
+                    git("checkout -b {0}".format(branch), show=debug, debug=debug)
                     git("push --set-upstream origin {0}".format(branch), show=debug, debug=debug)
                     git("push", show=debug, debug=debug)
     else:
         branch = curbr
 
-    git("pull", show=True, debug=debug)
+    git("pull", show=debug, debug=debug)
     subs = get_subs()
     if subs:
-        git("submodule update", show=True, debug=debug)
+        git("submodule update", show=debug, debug=debug)
         for sub in subs:
-            print ("Processing", sub[0])
+            if debug:
+                print ("Processing", sub[0])
             path = os.path.abspath(".")
             os.chdir(sub[0])
             # os.system("pwd")
