@@ -83,7 +83,11 @@ def update(branch, answer=None, debug=False):
         if out.find("error: pathspec") == 0:                        # if branch does not exist,
             out, err = git("checkout --track origin/%s" % branch, show=debug, debug=debug)   # create it
             if out.find("fatal: ") == 0:                    # new remote
-                if answer or answer==None and input("branch %s does not exist, create?" % branch).lower()[:1] == 'y':
+                if answer==None:
+                    answer = input("branch %s does not exist, create?" % branch).lower()[:1] == 'y'
+                    if answer==False:
+                        return
+                if answer:
                     print ("creating new branch: & tracking remote: %s" % branch)
                     git("checkout -b {0}".format(branch), show=True, debug=debug)
                     git("push --set-upstream origin {0}".format(branch), show=debug, debug=debug)
@@ -100,7 +104,7 @@ def update(branch, answer=None, debug=False):
             path = os.path.abspath(".")
             os.chdir(sub[0])
             # os.system("pwd")
-            update(branch, answer=False, debug=debug)
+            update(branch, answer=True, debug=debug)
             os.chdir(path)
 
 
