@@ -8,6 +8,9 @@ bless_term = Terminal()
 def print_green(s, **kw):
     print (bless_term.green(s), **kw)
 
+def print_emph(s, **kw):
+    print (bless_term.red(s), **kw)
+
 def clone(url, name, subs, debug, answer=None):
     if debug:
         print_green("clone(url=%s, name=%s, subs=%s, answer=%s)" % (url, name, subs, answer))
@@ -176,6 +179,27 @@ def status(debug=False):
         os.chdir(path)
 
 
+def help():
+    print_emph("clone <url>")
+    print ("like git clone\n")
+    print_emph("save")
+    print ("commit to local workspace\n")
+    print_emph("sync")
+    print ("sync with remote (pull + push)\n")
+    print_emph("branch <branch>")
+    print ("create or switch to a branch")
+    print ("if no branch specified, show available\n")
+    print_emph("pull <branch>")
+    print ("merge from branch to ourbranch\n")
+    print_emph("merge <branch>")
+    print ("""merge both ways; if successful, delete old branch
+default == master
+in future, trigger merge request if newbranch is owned/protected
+""")
+    print_emph("sub <folder>")
+    print ("create subproject\n")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('cmd')
@@ -189,7 +213,11 @@ if __name__ == "__main__":
     answer = True if args.yes else False if args.no else None    #None means prompt user
     print ("ver -- Versioning Easily Remembered")
 
-    if args.cmd == 'clone':
+
+    if args.cmd == 'help':
+        help()
+
+    elif args.cmd == 'clone':
         if is_ver_project():
             print("ERROR -- can't clone a new project within an existing one")
         else:
@@ -198,6 +226,7 @@ if __name__ == "__main__":
     elif not is_ver_project():
         print("ERROR -- not a ver project")
         exit()
+
     else:
         chdir_root()
 
