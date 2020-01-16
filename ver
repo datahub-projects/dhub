@@ -180,7 +180,7 @@ def status(debug=False):
 
 
 def help():
-    print_emph("clone <url>")
+    print_emph("clone <url> [--name] [--subs]")
     print ("like git clone\n")
     print_emph("save")
     print ("commit to local workspace\n")
