@@ -24,6 +24,8 @@ def clone(url, name, subs, debug, answer=None):
     else:
         if url[-1] == "/":
             branch = url[:-1]
+        else:
+            branch = url
         j = branch.rfind("/")
         branch = branch[j+1:]
 
