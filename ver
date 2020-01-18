@@ -177,7 +177,7 @@ def status(debug=False):
         os.chdir(sub[0])
         subbr = get_branch()
         if debug or subbr != curbr:
-            print ("  %s(%s) is on branch %s %s" % (sub[0], sub[1][:6], subbr, "" if subbr==curbr else "UNSYNCED" ))
+            print ("%s:  %s(%s) is on branch %s %s" % (sub[2], sub[0], sub[1][:6], subbr, "" if subbr==curbr else "UNSYNCED" ))
         os.chdir(path)
 
 

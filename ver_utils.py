@@ -31,6 +31,7 @@ def get_subs():
         if r.strip():
             sub = r.split()[:2]
             sub.reverse()
+            sub.append("Ignored" if  sub[1][:1]=="-" else "Tracked")
             sub[1] = sub[1].replace("+", "").replace("-", "")
             subs.append(sub)
     return subs
