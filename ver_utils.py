@@ -24,15 +24,21 @@ def git(cmd, show=False, debug=False):
 #
 # get full pathnames of active subdirectories
 #
-def get_subs():
+def get_subs(tracked_only = False):
     out, err = git("submodule status")
     subs = []
     for r in out.split("\n"):
         if r.strip():
             sub = r.split()[:2]
             sub.reverse()
-            sub.append("Ignored" if  sub[1][:1]=="-" else "Tracked")
-            sub[1] = sub[1].replace("+", "").replace("-", "")
+            tracked = sub[1][:1] != "-"
+            if (not tracked) and tracked_only:
+                continue
+            sub[1] = sub[1].replace("+", "").replace("-", "").strip()
+            if tracked:
+                sub.append("Tracked")
+            else:
+                sub.append("Ignored")
             subs.append(sub)
     return subs
 
