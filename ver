@@ -74,10 +74,11 @@ def save(local=False, debug=False, root=True):
         git("fetch", show=debug, debug=debug)
         git("merge --no-edit FETCH_HEAD", show=debug, debug=debug)
     git("add .", show=debug, debug=debug)
-    git(["commit", "-m", '"ver commit"'], show=debug, debug=debug)
+    out, err =git(["commit", "-m", '"ver commit"'], show=debug, debug=debug)
     if not local:
-        git("push", show=debug, debug=debug)
-
+        out, err = git("push", show=debug, debug=debug)
+    if root and not debug:
+        print (out.split("\n")[-2])
 
 def update(branch, answer=None, debug=False):
     if debug:
