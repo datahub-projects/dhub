@@ -35,7 +35,7 @@ def clone(url, name, subs, debug, answer=None):
     f.close()
 
     path = os.path.abspath(".")
-    for sub, commit in get_subs():
+    for sub, commit, _ in get_subs():
         include = False
         if not subs:                            #if none specified, prompt for each
             if answer or answer==None and input("Include subproject %s?" % sub).lower()[:1] == 'y':
@@ -220,6 +220,48 @@ in future, trigger merge request if newbranch is owned/protected
     print ("create subproject\n")
 
 
+def sub(remote, name=None, debug=False, answer=None):
+    """
+mkdir sub1
+cd sub1
+git init
+git remote add origin $PWD/../../../_tests/sub1bare
+echo "rooty/sub1" > rooty_file1
+git add rooty_file1
+git commit -am "rooty/rooty_file1 commit 1 (sub1)"
+git push --set-upstream origin master
+
+cd ../
+git submodule add ~/ver/_tests/sub1bare sub1
+git submodule update --init
+git commit -am "rooty/rooty_file1 commit 1 (rooty)"
+git push --set-upstream origin master
+"""
+    if not name:
+        name = remote
+        if name[-1] == "/":
+            name = name[:-1]
+        j = name.rfind("/")
+        name = name[j + 1:]
+    path = os.path.abspath(name)
+    if answer or answer == None and input("Create submodule at %s tracking %s?" % (path, remote)).lower()[:1] == 'y':
+        pass
+    return
+    os.mkdir(name)
+    os.chdir(name)
+
+# def new(remote, name=None, debug=False, answer=None):
+#     if name[-1] == "/":
+#         name = name[:-1]
+#     j = name.rfind("/")
+#     name = name[j + 1:]
+#     path = os.path.abspath(name)
+#     if answer or answer == None and input("Create submodule at %s tracking %s?" % (path, remote)).lower()[:1] == 'y':
+#         pass
+#     return
+#     os.mkdir(name)
+#     os.chdir(name)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('cmd')
@@ -277,6 +319,10 @@ if __name__ == "__main__":
 
         elif args.cmd == 'status':
             status(args.debug)
+
+        elif args.cmd == 'sub':
+            sub(remote=args.arg2, name=args.name, answer=answer, debug=args.debug)
+
 
         else:
             print ("Unknown ver command: %s" % args.cmd)
