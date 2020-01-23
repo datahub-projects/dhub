@@ -117,7 +117,7 @@ def update(branch, answer=None, debug=False):
         branch = curbr
 
     git("pull", show=debug, debug=debug)
-    subs = get_subs()
+    subs = get_subs(tracked_only=True)
     if subs:
         git("submodule update", show=debug, debug=debug)
         for sub in subs:
