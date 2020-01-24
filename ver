@@ -54,6 +54,7 @@ def clone(url, name, subs, debug, branch="master", answer=None):
             git("remote add origin %s" % suburl.strip(), show=debug, debug=debug)
             git("pull origin %s" % branch, show=debug, debug=debug)
             git("reset --hard %s" % commit, show=debug, debug=debug)
+            print("E", branch)
             update(branch, answer=False, debug=debug)
             if debug:
                 print ("forcing %s branch %s to %s" % (sub, branch, commit))
@@ -103,11 +104,16 @@ def save(local=False, debug=False, root=True):
 def update(branch, answer=None, debug=False):
     if debug:
         print_green("update(branch=%s, answer=%s)" % (branch, answer))
-    git("fetch", show=debug, debug=debug)  # could be slow -- prompt user?
+    print ("F", branch)
+    git("fetch origin %s" % branch, show=debug, debug=debug)  # could be slow -- prompt user?
+    print ("G", branch)
     curbr = get_branch()
+    print ("A", curbr)
     if branch and (curbr != branch):
+        print("B", curbr)
         out, err = git("checkout %s" % branch, show=debug, debug=debug)
         if out.find("error: pathspec") == 0:                        # if branch does not exist,
+            print("C", out)
             out, err = git("checkout --track origin/%s" % branch, show=debug, debug=debug)   # create it
             if out.find("fatal: ") == 0:                    # new remote
                 if answer==None:
@@ -121,8 +127,9 @@ def update(branch, answer=None, debug=False):
                     git("push", show=debug, debug=debug)
     else:
         branch = curbr
+    print ("D", branch)
 
-    git("pull", show=debug, debug=debug)
+    git("pull origin %s" % branch, show=debug, debug=debug)
     subs = get_subs(tracked_only=True)
     if subs:
         git("submodule update", show=debug, debug=debug)
