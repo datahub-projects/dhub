@@ -11,25 +11,25 @@ def print_green(s, **kw):
 def print_emph(s, **kw):
     print (bless_term.red(s), **kw)
 
-def clone(url, name, subs, debug, answer=None):
+def clone(url, name, subs, debug, branch="master", answer=None):
     if debug:
         print_green("clone(url=%s, name=%s, subs=%s, answer=%s)" % (url, name, subs, answer))
-    out, err = git("clone %s %s" % (url, name), show=True, debug=debug)
+    out, err = git("clone --single-branch -b %s %s %s" % (branch, url, name), show=True, debug=debug)
     if out.find('fatal') == 0:
         print (out, file=sys.stderr)
         return
 
     if name:
-        branch = name
+        subdir = name
     else:
         if url[-1] == "/":
-            branch = url[:-1]
+            subdir = url[:-1]
         else:
-            branch = url
-        j = branch.rfind("/")
-        branch = branch[j+1:]
+            subdir = url
+        j = subdir.rfind("/")
+        subdir = subdir[j+1:]
 
-    os.chdir(branch)
+    os.chdir(subdir)
     f = open(".ver_root", "w")
     f.write("This represents the root ver project. Please only have one in the path!")
     f.close()
@@ -268,6 +268,7 @@ if __name__ == "__main__":
     parser.add_argument('cmd')
     parser.add_argument('arg2', nargs='?')
     parser.add_argument('--name', default="")
+    parser.add_argument('--branch', default="master")
     parser.add_argument('--subs', default="")
     parser.add_argument('--debug', action="store_true")
     parser.add_argument('--yes', action="store_true")
@@ -284,7 +285,7 @@ if __name__ == "__main__":
         if is_ver_project():
             print("ERROR -- can't clone a new project within an existing one")
         else:
-            clone(url=args.arg2, name=args.name, subs=args.subs, debug=args.debug, answer=answer)
+            clone(url=args.arg2, name=args.name, subs=args.subs, debug=args.debug, branch=args.branch, answer=answer)
 
     elif not is_ver_project():
         print("ERROR -- not a ver project")
