@@ -31,6 +31,8 @@ def get_subs(tracked_only = False):
         if r.strip():
             sub = r.split()[:2]
             sub.reverse()
+            if sub[0] == "./":
+                continue
             tracked = sub[1][:1] != "-"
             if (not tracked) and tracked_only:
                 continue

@@ -61,6 +61,7 @@ def save(local=False, debug=False, root=True):
     if debug:
         print_green("save(local=%s, root=%s)" % (local, root))
     subs = get_subs(tracked_only=True)
+    # print ("SUBS:", subs)
     for sub in subs:
         if debug:
             print ("Processing", sub[0])
