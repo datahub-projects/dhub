@@ -46,7 +46,7 @@ def clone(url, name, subs, debug, branch="master", answer=None):
             print ("including: ", sub)
             os.chdir(sub)
             git("submodule update --init .", show=debug, debug=debug)
-            commit = git("rev-parse HEAD")[0]
+            # commit = git("rev-parse HEAD")[0]
             git("checkout %s" % branch, show=debug, debug=debug)
             update(branch, answer=False, debug=debug)
             if debug:
