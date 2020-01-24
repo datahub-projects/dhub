@@ -63,7 +63,12 @@ def clone(url, name, subs, debug, branch="master", answer=None):
         os.chdir(path)
 
 
-def save(local=False, debug=False, root=True):
+def save(local=False, pull=None, debug=False, root=True):
+    if pull:
+        branch = pull
+    else:
+        branch = get_branch()
+    print("SAVE", branch)
     if debug:
         print_green("save(local=%s, root=%s)" % (local, root))
     subs = get_subs(tracked_only=True)
@@ -73,12 +78,12 @@ def save(local=False, debug=False, root=True):
             print ("Processing", sub[0])
         path = os.path.abspath(".")
         os.chdir(sub[0])
-        save(local=local, debug=debug, root=False)
+        save(local=local, pull=branch, debug=debug, root=False)
         os.chdir(path)
     if debug and root:
         print("Processing root project in", os.path.abspath("."))
     if not local:
-        git("fetch", show=debug, debug=debug)
+        git("fetch origin %s" % branch, show=debug, debug=debug)
         git("merge --no-edit FETCH_HEAD", show=debug, debug=debug)
 
     git("add .", show=debug, debug=debug)
@@ -316,7 +321,11 @@ if __name__ == "__main__":
             merge(branch=args.arg2, debug=args.debug)
 
         elif args.cmd == 'pull':
-            save(local=False, debug=args.debug)
+            if args.arg2:
+                print ("PULL", args.arg2)
+                save(local=False, pull=args.arg2, debug=args.debug)
+            else:
+                save(local=False, debug=args.debug)
 
         elif args.cmd == 'branch':
             if not args.arg2:
