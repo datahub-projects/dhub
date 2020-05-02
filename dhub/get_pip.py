@@ -19,30 +19,53 @@ def get_package_dates(p):
             vers[x] = date                                      # FIXME: multiple uploads possible
     return vers
 
+def ver_is_stable(ver):
+    for x in ver.split('.'):
+        if not x.isnumeric():
+            return False
+    return True
 
-def get_package_info(p):
+
+def get_package_info(p, stable_only=True):
     dates = get_package_dates(p)
     cmd = ["pip", "install", "{0}==blarchy".format(p)]
     s, ok = rrun(cmd)
     if ok:
         raw = s.split(",")
+        raw[0] = raw[0].split("versions:")[1].strip()
+        raw[-1] = raw[-1].split(")\n")[0].strip()
+        # pprint(raw)
         vers = odic()
         for x in raw:
-            if x.find("ERROR") == -1:
-                x=x.strip()
-                if x in dates:
-                    vers[x]=dates[x]
-                else:
-                    print ("Warning: version in pip not in pypi:", x)
+            x = x.strip()
+            if stable_only:
+                if not ver_is_stable(x):
+                    continue
+            if x in dates:
+                vers[x]=dates[x]
+            else:
+                print ("Warning: version in pip not in pypi:", x)
         for x in dates:
+            if not ver_is_stable(x):
+                continue
             if x not in vers:
                 print ("Warning: version in pypi not in pip:", x)
         return vers
 
 
+def sort_by_date(vers):
+    lst = [[date, ver] for ver, date in vers.items()]
+    lst.sort()
+    sorted = odic()
+    for date, ver in lst:
+        sorted[ver]=date
+    return sorted
+
+
 def get_latest(package, before):
     # print ("B4:", before)
     vers = get_package_info(package)
+    vers = sort_by_date(vers)
     keys = list(vers.keys())
     keys.reverse()
     for ver in keys:
