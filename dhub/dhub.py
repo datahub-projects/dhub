@@ -2,7 +2,7 @@ import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 import get_pip
 from mod_sync import sync, mod
-from runrun import git_status
+from runrun import git_status, get_author, get_username, get_branch
 from blessings import Terminal
 bless_term = Terminal()
 
@@ -24,9 +24,9 @@ if __name__ == "__main__":
     # sync_args.add_argument("--insist")
 
     mod_args = subparsers.add_parser('mod')
-    mod_args.add_argument("--debug", action="store_true")
-    # mod_args.add_argument("--insist")
     mod_args.add_argument("--message")
+    mod_args.add_argument("--debug", action="store_true")
+    mod_args.add_argument("--insist", action="store_true")
 
     args = parser.parse_args()
 
@@ -63,8 +63,14 @@ if __name__ == "__main__":
         if not(args.message or git_status()):
             print_green("Nothing to do")
         else:
-            print_green("Rewriting tip (most recent) commit & pushing to remote")
-            mod(message=args.message, show=args.debug, debug=args.debug)
+            if get_author() != get_username() and not args.insist:
+                print_green("Different author --insist if you are sure")
+            else:
+                if get_branch=="master" and not args.insist:
+                    print_green("This operation will rebase the master branch --insist if you are sure")
+                else:
+                    print_green("Rewriting tip (most recent) commit & pushing to remote")
+                    mod(message=args.message, show=args.debug, debug=args.debug)
 
     elif command=="sync":
         print_green("Synchronizing local git repository and working tree to remote/origin")

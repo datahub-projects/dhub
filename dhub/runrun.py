@@ -86,6 +86,11 @@ def get_branch():
     out, err = git("rev-parse --abbrev-ref HEAD")
     return out.strip()
 
+def get_author():
+    return git("log -1 --pretty=format:'%an'")
+
+def get_username():
+    return git("config --get user.name")
 
 def git_status(show=False, debug=False):
     out, err = git("status --porcelain", show=show, debug=debug)
