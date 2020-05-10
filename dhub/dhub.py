@@ -2,7 +2,11 @@ import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 import get_pip
 from mod_sync import sync
+from blessings import Terminal
+bless_term = Terminal()
 
+def print_green(s, **kw):
+    print (bless_term.green(s), **kw)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -15,6 +19,7 @@ if __name__ == "__main__":
     reqs_args.add_argument("--date", default="3000-1-1")
 
     sync_args = subparsers.add_parser('sync')
+    sync_args.add_argument("--debug", action="store_true")
     sync_args.add_argument("--insist")
 
     args = parser.parse_args()
@@ -46,4 +51,5 @@ if __name__ == "__main__":
             print ("Coming soon: use pipreqs to create requirements list from scratch")
 
     elif command=="sync":
-        sync()
+        print_green("Synchronizing local git repository and working tree to remote/origin")
+        sync(show=args.debug, debug=args.debug)
