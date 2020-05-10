@@ -1,6 +1,11 @@
 import  subprocess, time, os, sys
+from blessings import Terminal
+bless_term = Terminal()
 
 MAXLINES=100
+
+def print_red(s, **kw):
+    print (bless_term.red(s), **kw)
 
 def run(*args, **kw):
     # print ("DBG", args, kw)
@@ -60,6 +65,26 @@ def run(*args, **kw):
     except subprocess.CalledProcessError as e:
         out = e.output
     return out, complete
+
+#
+# run a git command, capture the output
+#
+def git(cmd, show=False, debug=False):
+    if debug:
+        print_red ("git %s" % cmd)
+    if hasattr(cmd, "lower"):
+        cmd = cmd.split()
+    out, good = run(["git"] + cmd, showoutput=show)
+    if not good:
+        err = "ERROR -- git command did not complete"
+        print (err, file=sys.stderr)
+        out += "\n\n" + err
+    return out, not good
+
+def get_branch():
+    out, err = git("rev-parse --abbrev-ref HEAD")
+    return out.strip()
+
 
 if __name__ == "__main__":
     print("test run.py")

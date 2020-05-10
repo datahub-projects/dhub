@@ -1,6 +1,8 @@
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 import get_pip
+from mod_sync import sync
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -16,9 +18,9 @@ if __name__ == "__main__":
     sync_args.add_argument("--insist")
 
     args = parser.parse_args()
-    cmd=sys.argv[1]                          #really? is this the only way?
+    command=sys.argv[1]                          #really? is this the only way?
 
-    if cmd=="reqs":
+    if command=="reqs":
         b4 = parsedate(args.date)
         # print ("REQS", args, b4)
         if args.package:
@@ -43,5 +45,5 @@ if __name__ == "__main__":
         else:
             print ("Coming soon: use pipreqs to create requirements list from scratch")
 
-    elif cmd=="sync":
-        print("Coming soon: sync to remote")
+    elif command=="sync":
+        sync()
