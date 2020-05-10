@@ -7,15 +7,15 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(help='commands')
 
     reqs_args = subparsers.add_parser('reqs')
-    reqs_args.add_argument("--_reqs_", default=True)
     reqs_args.add_argument("--package")
     reqs_args.add_argument("--import")
     reqs_args.add_argument("--file")
     reqs_args.add_argument("--date", default="3000-1-1")
 
     args = parser.parse_args()
+    cmd=sys.argv[1]                          #really? is this the only way?
 
-    if hasattr(args, "_reqs_"):
+    if cmd=="reqs":
         b4 = parsedate(args.date)
         # print ("REQS", args, b4)
         if args.package:
