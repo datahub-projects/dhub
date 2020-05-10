@@ -20,7 +20,7 @@ if __name__ == "__main__":
         # print ("REQS", args, b4)
         if args.package:
             version, date = get_pip.get_latest(args.package, b4)
-            print ("{0}=={1}   #released {2}".format(args.package, version, date.ctime()))
+            print("{0: <40} #released {1}".format("{0}=={1}".format(args.package, version), date.ctime()))
         elif args.file:
             f=open(args.file)
             for pkg in f.readlines():
@@ -33,4 +33,4 @@ if __name__ == "__main__":
                     print ("Skipping", pkg)
                 pkg=pkg.split("==")[0]
                 version, date = get_pip.get_latest(pkg, b4)
-                print("{0}=={1}   #released {2}".format(pkg, version, date.ctime()))
+                print("{0: <40} #released {1}".format("{0}=={1}".format(pkg, version), date.ctime()))
