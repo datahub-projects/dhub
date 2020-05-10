@@ -4,13 +4,16 @@ import get_pip
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    subparsers = parser.add_subparsers(help='commands')
+    subparsers = parser.add_subparsers(help='are available commands (first position, no hyphens)')
 
     reqs_args = subparsers.add_parser('reqs')
     reqs_args.add_argument("--package")
     reqs_args.add_argument("--importname")
     reqs_args.add_argument("--file")
     reqs_args.add_argument("--date", default="3000-1-1")
+
+    sync_args = subparsers.add_parser('sync')
+    sync_args.add_argument("--insist")
 
     args = parser.parse_args()
     cmd=sys.argv[1]                          #really? is this the only way?
@@ -39,3 +42,6 @@ if __name__ == "__main__":
 
         else:
             print ("Coming soon: use pipreqs to create requirements list from scratch")
+
+    elif cmd=="sync":
+        print("Coming soon: sync to remote")
