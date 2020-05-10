@@ -7,6 +7,7 @@ def mod(message=None, insist=False, debug=False, show=False):
         git("commit --all --amend --reuse-message HEAD", show=show, debug=debug)
     git("push -f", show=show, debug=debug)
 
+
 def sync(insist=False, debug=False, show=False):
     branch=get_branch()
     git("fetch origin", show=show, debug=debug)

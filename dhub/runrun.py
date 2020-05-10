@@ -81,9 +81,22 @@ def git(cmd, show=False, debug=False):
         out += "\n\n" + err
     return out, not good
 
+
 def get_branch():
     out, err = git("rev-parse --abbrev-ref HEAD")
     return out.strip()
+
+
+def git_status(show=False, debug=False):
+    out, err = git("status --porcelain", show=show, debug=debug)
+    changes=0
+    for row in out.split("\n"):
+        row = row.strip()
+        if not row:
+            continue
+        if row[:2] != "??":
+            changes += 1
+    return changes
 
 
 if __name__ == "__main__":

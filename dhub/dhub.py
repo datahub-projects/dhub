@@ -1,7 +1,8 @@
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 import get_pip
-from mod_sync import sync
+from mod_sync import sync, mod
+from runrun import git_status
 from blessings import Terminal
 bless_term = Terminal()
 
@@ -28,7 +29,10 @@ if __name__ == "__main__":
     mod_args.add_argument("--message")
 
     args = parser.parse_args()
-    command=sys.argv[1]                          #really? is this the only way?
+
+    command=None
+    if len(sys.argv)>1:
+        command=sys.argv[1]                          #really? is this the only way?
 
     if command=="reqs":
         b4 = parsedate(args.date)
@@ -56,8 +60,11 @@ if __name__ == "__main__":
             print ("Coming soon: use pipreqs to create requirements list from scratch")
 
     elif command=="mod":
-        print_green("Rewriting tip (most recent) commit & pushing to remote")
-        sync(show=args.debug, debug=args.debug)
+        if not(args.message or git_status()):
+            print_green("Nothing to do")
+        else:
+            print_green("Rewriting tip (most recent) commit & pushing to remote")
+            mod(message=args.message, show=args.debug, debug=args.debug)
 
     elif command=="sync":
         print_green("Synchronizing local git repository and working tree to remote/origin")
