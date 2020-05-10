@@ -17,6 +17,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if hasattr(args, "_reqs_"):
-        date = parsedate(args.date)
-        print ("REQS", args, date)
-        # if args.package:
+        b4 = parsedate(args.date)
+        print ("REQS", args, b4)
+        if args.package:
+            version, date = get_pip.get_latest(args.package, b4)
+            print ("{0}=={1}\nreleased {2}".format(args.package, version, date.ctime()))
