@@ -20,7 +20,12 @@ if __name__ == "__main__":
 
     sync_args = subparsers.add_parser('sync')
     sync_args.add_argument("--debug", action="store_true")
-    sync_args.add_argument("--insist")
+    # sync_args.add_argument("--insist")
+
+    mod_args = subparsers.add_parser('mod')
+    mod_args.add_argument("--debug", action="store_true")
+    # mod_args.add_argument("--insist")
+    mod_args.add_argument("--message")
 
     args = parser.parse_args()
     command=sys.argv[1]                          #really? is this the only way?
@@ -49,6 +54,10 @@ if __name__ == "__main__":
 
         else:
             print ("Coming soon: use pipreqs to create requirements list from scratch")
+
+    elif command=="mod":
+        print_green("Rewriting tip (most recent) commit & pushing to remote")
+        sync(show=args.debug, debug=args.debug)
 
     elif command=="sync":
         print_green("Synchronizing local git repository and working tree to remote/origin")
