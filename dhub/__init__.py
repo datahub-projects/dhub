@@ -1,9 +1,17 @@
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
-import get_pip
-from mod_sync import sync, mod
-from runrun import git_status, get_author, get_username, get_branch
 from blessings import Terminal
+#the BDOL does not admire scripts which are also importable modules
+#well frack him
+# try:
+from . import get_pip
+from .mod_sync import sync, mod
+from .runrun import git_status, get_author, get_username, get_branch
+# except:
+#     import get_pip
+#     from mod_sync import sync, mod
+#     from runrun import git_status, get_author, get_username, get_branch
+
 bless_term = Terminal()
 
 def _print_green(s, **kw):

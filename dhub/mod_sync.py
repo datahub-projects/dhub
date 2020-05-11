@@ -1,4 +1,4 @@
-from runrun import git, get_branch
+from .runrun import git, get_branch
 
 def mod(message=None, insist=False, debug=False, show=False):
     if message:

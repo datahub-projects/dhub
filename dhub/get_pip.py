@@ -4,7 +4,7 @@ from collections import OrderedDict as odic
 from pprint import pprint
 import dateutil.parser as dup
 
-from runrun import run as rrun
+from .runrun import run as rrun
 
 def get_package_dates(p):
     #https://pypi.org/pypi/mido/json
