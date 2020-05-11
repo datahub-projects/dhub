@@ -65,8 +65,9 @@ if __name__ == "__main__":
         else:
             if get_author() != get_username() and not args.insist:
                 print_green("Different author --insist if you are sure")
+                # print (get_author(), get_username())
             else:
-                if get_branch=="master" and not args.insist:
+                if get_branch()=="master" and not args.insist:
                     print_green("This operation will rebase the master branch --insist if you are sure")
                 else:
                     print_green("Rewriting tip (most recent) commit & pushing to remote")

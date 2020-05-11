@@ -2,7 +2,7 @@ from runrun import git, get_branch
 
 def mod(message=None, insist=False, debug=False, show=False):
     if message:
-        git("commit --all --amend --message {0}".format(message), show=show, debug=debug)
+        git(["commit", "--all", "--amend", "--message", message], show=show, debug=debug)
     else:
         git("commit --all --amend --reuse-message HEAD", show=show, debug=debug)
     git("push -f", show=show, debug=debug)

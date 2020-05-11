@@ -87,10 +87,10 @@ def get_branch():
     return out.strip()
 
 def get_author():
-    return git("log -1 --pretty=format:'%an'")
+    return git("log -1 --pretty=format:'%an'")[0].strip().replace("'", "")
 
 def get_username():
-    return git("config --get user.name")
+    return git("config --get user.name")[0].strip()
 
 def git_status(show=False, debug=False):
     out, err = git("status --porcelain", show=show, debug=debug)
