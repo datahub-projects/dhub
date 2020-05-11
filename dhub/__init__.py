@@ -1,16 +1,17 @@
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
+
+#
 #the BDOL does not admire scripts which are also importable modules
 #well frack him
-# try:
-from . import get_pip
-from .mod_sync import sync, mod
-from .runrun import git_status, get_author, get_username, get_branch
-# except:
-#     import get_pip
-#     from mod_sync import sync, mod
-#     from runrun import git_status, get_author, get_username, get_branch
+#
+if __name__=="__main__":
+    sys.path.append("..")   #so absolute imports work in script mode, we need to import from the parent folder
+
+from dhub import get_pip
+from dhub.mod_sync import sync, mod
+from dhub.runrun import git_status, get_author, get_username, get_branch
 
 bless_term = Terminal()
 
