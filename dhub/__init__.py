@@ -8,6 +8,7 @@ from blessings import Terminal
 #
 if __name__=="__main__":
     #so absolute imports work in script mode, we need to import from the parent folder
+    opath = os.path.abspath(".")
     abspath = os.path.abspath(__file__)
     abspath = abspath[:abspath.rfind('/') + 1]
     os.chdir(abspath)
@@ -17,6 +18,10 @@ if __name__=="__main__":
 from dhub import get_pip
 from dhub.mod_sync import sync, mod
 from dhub.runrun import git_status, get_author, get_username, get_branch
+
+if __name__=="__main__":
+    os.chdir(opath)
+
 
 bless_term = Terminal()
 
