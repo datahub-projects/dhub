@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
