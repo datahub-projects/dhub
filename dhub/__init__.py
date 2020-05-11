@@ -7,7 +7,12 @@ from blessings import Terminal
 #well frack him
 #
 if __name__=="__main__":
-    sys.path.append("..")   #so absolute imports work in script mode, we need to import from the parent folder
+    #so absolute imports work in script mode, we need to import from the parent folder
+    abspath = os.path.abspath(__file__)
+    abspath = abspath[:abspath.rfind('/') + 1]
+    os.chdir(abspath)
+    abspath = os.path.abspath("..")
+    sys.path.insert(0, abspath)
 
 from dhub import get_pip
 from dhub.mod_sync import sync, mod
