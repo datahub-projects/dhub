@@ -6,7 +6,7 @@ from runrun import git_status, get_author, get_username, get_branch
 from blessings import Terminal
 bless_term = Terminal()
 
-def print_green(s, **kw):
+def _print_green(s, **kw):
     print (bless_term.green(s), **kw)
 
 if __name__ == "__main__":
@@ -61,18 +61,18 @@ if __name__ == "__main__":
 
     elif command=="mod":
         if not(args.message or git_status()):
-            print_green("Nothing to do")
+            _print_green("Nothing to do")
         else:
             if get_author() != get_username() and not args.insist:
-                print_green("Different author --insist if you are sure")
+                _print_green("Different author --insist if you are sure")
                 # print (get_author(), get_username())
             else:
                 if get_branch()=="master" and not args.insist:
-                    print_green("This operation will rebase the master branch --insist if you are sure")
+                    _print_green("This operation will rebase the master branch --insist if you are sure")
                 else:
-                    print_green("Rewriting tip (most recent) commit & pushing to remote")
+                    _print_green("Rewriting tip (most recent) commit & pushing to remote")
                     mod(message=args.message, show=args.debug, debug=args.debug)
 
     elif command=="sync":
-        print_green("Synchronizing local git repository and working tree to remote/origin")
+        _print_green("Synchronizing local git repository and working tree to remote/origin")
         sync(show=args.debug, debug=args.debug)
