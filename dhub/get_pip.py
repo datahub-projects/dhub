@@ -26,7 +26,7 @@ def ver_is_stable(ver):
     return True
 
 
-def get_package_info(p, stable_only=True):
+def get_package_info(p, stable_only=True, debug=False):
     dates = get_package_dates(p)
     cmd = ["pip", "install", "{0}==blarchy".format(p)]
     s, ok = rrun(cmd)
@@ -44,12 +44,14 @@ def get_package_info(p, stable_only=True):
             if x in dates:
                 vers[x]=dates[x]
             else:
-                print ("Warning: version in pip not in pypi:", x)
+                if debug:
+                    print ("# Warning: version in pip not in pypi:", x)
         for x in dates:
             if not ver_is_stable(x):
                 continue
             if x not in vers:
-                print ("Warning: version in pypi not in pip:", x)
+                if debug:
+                    print ("# Warning: version in pypi not in pip:", x)
         return vers
 
 
@@ -62,9 +64,9 @@ def sort_by_date(vers):
     return sorted
 
 
-def get_latest(package, before):
+def get_latest(package, before, debug=False):
     # print ("B4:", before)
-    vers = get_package_info(package)
+    vers = get_package_info(package, debug=debug)
     vers = sort_by_date(vers)
     keys = list(vers.keys())
     keys.reverse()

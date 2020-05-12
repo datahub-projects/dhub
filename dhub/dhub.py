@@ -34,6 +34,7 @@ reqs_args.add_argument("--package")
 reqs_args.add_argument("--importname")
 reqs_args.add_argument("--file")
 reqs_args.add_argument("--date", default="3000-1-1")
+reqs_args.add_argument("--debug", action="store_true")
 
 sync_args = subparsers.add_parser('sync')
 sync_args.add_argument("--debug", action="store_true")
@@ -54,7 +55,7 @@ if command=="reqs":
     b4 = parsedate(args.date)
     # print ("REQS", args, b4)
     if args.package:
-        version, date = get_pip.get_latest(args.package, b4)
+        version, date = get_pip.get_latest(args.package, b4, args.debug)
         print("{0: <40} #released {1}".format("{0}=={1}".format(args.package, version), date.ctime()))
     elif args.file:
         f=open(args.file)
@@ -66,8 +67,9 @@ if command=="reqs":
                 continue
             if pkg[0]=='-':
                 print ("Skipping", pkg)
+                continue
             pkg=pkg.split("==")[0]
-            version, date = get_pip.get_latest(pkg, b4)
+            version, date = get_pip.get_latest(pkg, b4, args.debug)
             print("{0: <40} #released {1}".format("{0}=={1}".format(pkg, version), date.ctime()))
     elif args.importname:
         print ("Coming soon: cv2 implies openCV")
