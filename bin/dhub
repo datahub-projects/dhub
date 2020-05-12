@@ -1,3 +1,1 @@
-#!/bin/bash
-which python3
-
+../dhub/dhub.py
