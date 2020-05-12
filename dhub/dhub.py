@@ -76,18 +76,15 @@ if command=="reqs":
         print ("Coming soon: use pipreqs to create requirements list from scratch")
 
 elif command=="mod":
-    # if not(args.message or git_status()):
-    #     _print_green("Nothing to do")
-    # else:
-        if get_author() != get_username() and not args.insist:
-            _print_green("Different author --insist if you are sure")
-            # print (get_author(), get_username())
+    if get_author() != get_username() and not args.insist:
+        _print_green("Different author --insist if you are sure")
+        # print (get_author(), get_username())
+    else:
+        if get_branch()=="master" and not args.insist:
+            _print_green("This operation will rebase the master branch --insist if you are sure")
         else:
-            if get_branch()=="master" and not args.insist:
-                _print_green("This operation will rebase the master branch --insist if you are sure")
-            else:
-                _print_green("Rewriting tip (most recent) commit & pushing to remote")
-                mod(message=args.message, show=args.debug, debug=args.debug)
+            _print_green("Rewriting tip (most recent) commit & pushing to remote")
+            mod(message=args.message, show=args.debug, debug=args.debug)
 
 elif command=="sync":
     _print_green("Synchronizing local git repository and working tree to remote/origin")
