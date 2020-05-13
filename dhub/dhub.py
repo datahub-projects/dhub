@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os, sys, argparse, datetime
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
@@ -27,7 +27,7 @@ def _print_green(s, **kw):
     print (bless_term.green(s), **kw)
 
 parser = argparse.ArgumentParser(description=__doc__)
-subparsers = parser.add_subparsers(help='are available commands (first position, no hyphens)')
+subparsers = parser.add_subparsers(help='followed by --help for command-specific options')
 
 reqs_args = subparsers.add_parser('reqs')
 reqs_args.add_argument("--package")
@@ -91,3 +91,6 @@ elif command=="mod":
 elif command=="sync":
     _print_green("Synchronizing local git repository and working tree to remote/origin")
     sync(show=args.debug, debug=args.debug)
+
+else:
+    parser.print_help()
