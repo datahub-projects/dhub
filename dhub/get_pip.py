@@ -10,7 +10,11 @@ def get_package_dates(p):
     #https://pypi.org/pypi/mido/json
     url = "https://pypi.org/pypi/{0}/json".format(p)
     j=requests.get(url).content
-    data=json.loads(j)
+    try:
+        data=json.loads(j)
+    except:
+        print ("# warning: could not find page for {0}".format(p))
+        return None
     vers = odic()
     for x in data['releases']:
         for y in data['releases'][x]:
@@ -28,6 +32,8 @@ def ver_is_stable(ver):
 
 def get_package_info(p, stable_only=True, debug=False):
     dates = get_package_dates(p)
+    if not dates:
+        return None
     cmd = ["pip", "install", "{0}==blarchy".format(p)]
     s, ok = rrun(cmd)
     if ok:
@@ -52,6 +58,8 @@ def get_package_info(p, stable_only=True, debug=False):
             if x not in vers:
                 if debug:
                     print ("# Warning: version in pypi not in pip:", x)
+        if len(vers)==0 and stable_only:
+            print ("# Warning: No candidates found for {0} - try --unstable".format(p))
         return vers
 
 
@@ -64,9 +72,11 @@ def sort_by_date(vers):
     return sorted
 
 
-def get_latest(package, before, debug=False):
+def get_latest(package, before, stable=True, debug=False):
     # print ("B4:", before)
-    vers = get_package_info(package, debug=debug)
+    vers = get_package_info(package, stable_only=stable, debug=debug)
+    if not vers:
+        return None, None
     vers = sort_by_date(vers)
     keys = list(vers.keys())
     keys.reverse()
