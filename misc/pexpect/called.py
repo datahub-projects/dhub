@@ -1,4 +1,8 @@
-print ("Take it away, A!")
-x=input("hit me 1 time:\n")
-print ("Oh, %s you say?" % x)
-print ("Well, that's where the story ends -- so far. Stay tuned!")
+import random
+n=random.randint(0,7)
+print ("what is %s * 2? " % n, end='')
+x=input("type answer:\n")
+if int(x)==n*2:
+    print ("Correct")
+else:
+    print ("Soory -- you have been voted off the island")
