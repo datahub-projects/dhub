@@ -125,6 +125,7 @@ elif command=="remote":
         f.close()
     else:
         subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
+    print ("Exit dhub")
 
 else:
     parser.print_help()
