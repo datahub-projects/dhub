@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, argparse, datetime
+import os, sys, argparse, json, datetime
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
 
@@ -48,6 +48,7 @@ mod_args.add_argument("--insist", action="store_true")
 
 rem_args = subparsers.add_parser('remote')
 rem_args.add_argument("url")
+rem_args.add_argument("--name")
 rem_args.add_argument("--debug", action="store_true")
 
 
@@ -105,9 +106,18 @@ elif command=="sync":
     sync(show=args.debug, debug=args.debug)
 
 elif command=="remote":
-    print ("Connecting to", args.url)
+    # if args.name:
+    #     f = open
+    url = args.url
+    fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), url)
+    print ("FN",fn)
+    if os.path.exists(fn):
+        f = open(fn)
+        url = f.read().strip()
+        f.close()
+    print ("Connecting to", url)
     from subprocess import call, PIPE
-    call(['ssh', args.url], stdin=sys.stdin, stdout=sys.stdout)
+    call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
 
 else:
     parser.print_help()
