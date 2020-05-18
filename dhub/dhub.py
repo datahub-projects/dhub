@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, argparse, json, datetime
+import os, sys, argparse, json, datetime, subprocess
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
 
@@ -49,6 +49,7 @@ mod_args.add_argument("--insist", action="store_true")
 rem_args = subparsers.add_parser('remote')
 rem_args.add_argument("url")
 rem_args.add_argument("--name")
+rem_args.add_argument("--source")
 rem_args.add_argument("--debug", action="store_true")
 
 
@@ -118,8 +119,12 @@ elif command=="remote":
         url = f.read().strip()
         f.close()
     print ("Connecting to", url)
-    from subprocess import call, PIPE
-    call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
+    if args.source:
+        f = open(args.source)
+        subprocess.call(['ssh', '-T', url], stdin=f, stdout=sys.stdout)
+        f.close()
+    else:
+        subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
 
 else:
     parser.print_help()
