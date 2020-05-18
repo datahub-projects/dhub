@@ -106,11 +106,13 @@ elif command=="sync":
     sync(show=args.debug, debug=args.debug)
 
 elif command=="remote":
-    # if args.name:
-    #     f = open
     url = args.url
+    if args.name:
+        fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), args.name)
+        f = open(fn, 'w')
+        f.write(url)
+        f.close()
     fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), url)
-    print ("FN",fn)
     if os.path.exists(fn):
         f = open(fn)
         url = f.read().strip()
