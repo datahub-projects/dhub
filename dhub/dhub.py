@@ -46,6 +46,11 @@ mod_args.add_argument("--message")
 mod_args.add_argument("--debug", action="store_true")
 mod_args.add_argument("--insist", action="store_true")
 
+rem_args = subparsers.add_parser('remote')
+rem_args.add_argument("url")
+rem_args.add_argument("--debug", action="store_true")
+
+
 args = parser.parse_args()
 
 command=None
@@ -98,6 +103,11 @@ elif command=="mod":
 elif command=="sync":
     _print_green("Synchronizing local git repository and working tree to remote/origin")
     sync(show=args.debug, debug=args.debug)
+
+elif command=="remote":
+    print ("Connecting to", args.url)
+    from subprocess import call, PIPE
+    call(['ssh', args.url], stdin=sys.stdin, stdout=sys.stdout)
 
 else:
     parser.print_help()
