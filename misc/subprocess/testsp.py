@@ -4,15 +4,28 @@ from queue import Queue, Empty
 import time
 import random
 
-# def getabit(o, q):
-#     for c in iter(lambda:o.read(1), b''):
-#         q.put(c)
-#     o.close()
+def parse_output(s):
+    print ("----------PARSE------------")
+    print (s)
+    print ("~~~~~~~~~~~~~~~~~")
+    for L in s.split():
+        try:
+            N = int(L.strip())
+        except:
+            pass
+    print ("RESULT:", N)
+    print ("----------/PARSE------------")
+    return "BOOM " * N
 
 t0=time.time()
 def getline(o, q):
     for c in iter(lambda:o.readline(), b''):
         print ("---%s %s---" % (c, time.time()-t0))
+        q.put(c)
+    o.close()
+
+def getabit(o, q):
+    for c in iter(lambda:o.read(1), b''):
         q.put(c)
     o.close()
 
@@ -29,22 +42,9 @@ def getdata(q):
 
 pobj = sp.Popen('python3 called.py', stdin=sp.PIPE, stdout=sp.PIPE, shell=True)
 q = Queue()
-t = Thread(target=getline, args=(pobj.stdout, q))
+t = Thread(target=getabit, args=(pobj.stdout, q))
 t.daemon = True
 t.start()
-
-def parse_output(s):
-    print ("----------PARSE------------")
-    print (s)
-    print ("~~~~~~~~~~~~~~~~~")
-    for L in s.split():
-        try:
-            N = int(L.strip())
-        except:
-            pass
-    print ("RESULT:", N)
-    print ("----------/PARSE------------")
-    return "BOOM " * N
 
 while True:
     # print('Sleep for 1 second...')
