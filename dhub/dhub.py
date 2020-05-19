@@ -2,6 +2,7 @@
 import os, sys, argparse, json, datetime, subprocess
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
+from runrun import runner
 
 #
 #the BDOL does not admire scripts which are also importable modules
@@ -124,7 +125,13 @@ elif command=="remote":
         subprocess.call(['ssh', '-T', url], stdin=f, stdout=sys.stdout)
         f.close()
     else:
-        subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
+        # subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
+        sub = runner("ssh -T "+url)
+        out = sub.interact()
+        while True:
+            print (out)
+            inp = input(">>> ")
+            out = sub.interact(inp)
     print ("Exit dhub")
 
 else:
