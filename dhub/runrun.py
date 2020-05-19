@@ -131,6 +131,8 @@ def getdata(q):
 
 
 def test_func(s):
+    if not s:
+        return ""
     # print ("----------PARSE------------")
     # print (s)
     # print ("~~~~~~~~~~~~~~~~~")
@@ -157,6 +159,7 @@ class runner:
     # call interact with user input, returns next process text+prompt
     #
     def interact(self, cmd=None):
+        trip = 3
         if cmd:                                         #typically None for first interaction to get prompt
             # print ("===%s==="%cmd)
             self.pobj.stdin.write(bytes(cmd, 'utf-8'))
@@ -164,19 +167,24 @@ class runner:
             try:
                 self.pobj.stdin.flush()
             except:
-                return None
+                return ''
             self.in_dat = cmd
         o_dat = getdata(self.q).decode('utf8')
         while not o_dat:
             o_dat = getdata(self.q).decode('utf8')
             time.sleep(.1)
+            if not self.t.isAlive():
+                trip-=1
+                if trip==0:
+                    return ''
         if o_dat.find(self.in_dat+"\n")==0:
             o_dat=o_dat[len(self.in_dat)+1:]
         return o_dat
 
 
 if __name__=="__main__":
-    cmd = "python testri.py"
+    cmd = "echo foo"
+    # cmd = "echoz foo"
     print (cmd, end="\n\n")
     run = runner(cmd)
     o = run.interact()                                  #get initial startup spam + prompt
@@ -186,7 +194,7 @@ if __name__=="__main__":
         cmd = "Response %s %s" % (i, resp)
         print ("--> %s" % cmd)
         o = run.interact(cmd)                           #respond to process output+prompt with next command
-        if o==None:
+        if not o:
             break
         print(o, end='')
     print ("DONE")
