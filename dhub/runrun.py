@@ -189,11 +189,38 @@ def test_func(s):
     return "BOOM " * N
 
 
+class runner:
+    def __init__(self, cmd):
+        self.pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, shell=True)
+        self.q = Queue()
+        self.t = Thread(target=getabit, args=(self.pobj.stdout, self.q))
+        self.t.daemon = True
+        self.t.start()
+
+    #
+    # call interact with user input, returns next process text+prompt
+    #
+    def interact(self, cmd=None):
+        if cmd:
+            self.pobj.stdin.write(bytes(cmd, 'utf-8'))
+            self.pobj.stdin.write(b'\n')
+            self.pobj.stdin.flush()
+        dat = getdata(self.q).decode('utf8')
+        while not dat:
+            dat = getdata(self.q).decode('utf8')
+            time.sleep(.1)
+        return dat
+
+
 if __name__=="__main__":
     cmd = "python testri.py"
     print (cmd)
-    run_interactive(cmd, test_func)
-
+    run = runner(cmd)
+    o = run.interact()
+    print ("$>%s<$" % o)
+    for i in range(3):
+        o = run.interact("Response %s" % i)
+        print ("$>%s<$" % o)
     print ("DONE")
 
 # if __name__ == "__main__":
