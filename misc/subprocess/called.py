@@ -1,4 +1,6 @@
 print ("Take it away, A!")
 x=input("hit me 1 time:\n")
-print ("Oh, %s you say?" % x)
+print ("You said it: %s" % x)
+x=input("hit me 2 time:\n")
+print ("You said it: %s" % x)
 print ("Well, that's where the story ends -- so far. Stay tuned!")
