@@ -109,9 +109,12 @@ elif command=="sync":
 
 elif command=="remote":
     url = args.url
+    #
+    #  alias
+    #
     if args.name:
         fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), args.name)
-        f = open(fn, 'w')
+        f = open(fn, 'w')               #FIXME create folders
         f.write(url)
         f.close()
     fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), url)
@@ -120,18 +123,23 @@ elif command=="remote":
         url = f.read().strip()
         f.close()
     print ("Connecting to", url)
+
     if args.source:
         f = open(args.source)
-        subprocess.call(['ssh', '-T', url], stdin=f, stdout=sys.stdout)
-        f.close()
-    else:
-        # subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
         sub = runner("ssh -T "+url)
         out = sub.interact()
-        while True:
-            print (out)
-            inp = input(">>> ")
-            out = sub.interact(inp)
+        if "Permission denied" in out:
+            print ("Problem logging in to %s" % url)
+        else:
+            print(out)
+            for row in f.readlines():
+                row.rstrip()
+                print (">>> " + row, end='')
+                out = sub.interact(row)
+                print (out, end='')
+        f.close()
+    else:
+        subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
     print ("Exit dhub")
 
 else:

@@ -149,7 +149,7 @@ def test_func(s):
 
 class runner:
     def __init__(self, cmd):
-        self.pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, shell=True)
+        self.pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT, shell=True)
         self.q = Queue()
         self.t = Thread(target=getabit, args=(self.pobj.stdout, self.q))
         self.t.daemon = True
