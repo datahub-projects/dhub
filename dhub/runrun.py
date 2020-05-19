@@ -144,12 +144,21 @@ def run_interactive(cmd, input_func):
         if o_dat.find(in_dat+"\n")==0:
             o_dat=o_dat[len(in_dat)+1:]
         # print ("LEN:", len(in_dat))
+        if o_dat[-1:]=="\n":
+            end = "\n"
+            o_dat = o_dat[:-1]
+        else:
+            end = ''
         rows = o_dat.split("\n")
-        rows = "\n$ ".join(rows)
-        print(rows, end='')
+        # print("=>%s<="%rows)
+        rows = "$ " + "\n$ ".join(rows)
+        print(rows, end=end)
         if t.isAlive():
             in_dat = input_func(o_dat)
-            print ("> %s"%in_dat)
+            if end:
+                print ("> %s"%in_dat)
+            else:
+                print (in_dat)
             pobj.stdin.write(bytes(in_dat, 'utf-8'))
             pobj.stdin.write(b'\n')
             pobj.stdin.flush()
@@ -161,6 +170,7 @@ def test_func(s):
     # print ("----------PARSE------------")
     # print (s)
     # print ("~~~~~~~~~~~~~~~~~")
+    N = 11
     for L in s.split():
         try:
             N = int(L.strip())
