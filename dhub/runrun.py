@@ -202,7 +202,7 @@ class runner:
     #
     def interact(self, cmd=None):
         if cmd:                                         #typically None for first interaction to get prompt
-            print ("===%s==="%cmd)
+            # print ("===%s==="%cmd)
             self.pobj.stdin.write(bytes(cmd, 'utf-8'))
             self.pobj.stdin.write(b'\n')
             try:
@@ -216,29 +216,23 @@ class runner:
             time.sleep(.1)
         if o_dat.find(self.in_dat+"\n")==0:
             o_dat=o_dat[len(self.in_dat)+1:]
-        # print ("LEN:", len(in_dat))
-        if o_dat[-1:]=="\n":
-            end = "\n"
-            o_dat = o_dat[:-1]
-        else:
-            end = ''
         return o_dat
 
 
 if __name__=="__main__":
     cmd = "python testri.py"
-    print (cmd)
+    print (cmd, end="\n\n")
     run = runner(cmd)
     o = run.interact()                                  #get initial startup spam + prompt
-    print ("$>%s<$" % o)
+    print (o, end='')
     for i in range(44):
         resp = test_func(o)
         cmd = "Response %s %s" % (i, resp)
-        print ("~>%s<~" % cmd)
+        print ("--> %s" % cmd)
         o = run.interact(cmd)                           #respond to process output+prompt with next command
         if o==None:
             break
-        print ("$>%s<$" % o)
+        print(o, end='')
     print ("DONE")
 
 # if __name__ == "__main__":
