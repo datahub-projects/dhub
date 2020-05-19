@@ -109,8 +109,16 @@ from queue import Queue, Empty
 import time
 
 
+# def getabit(o, q):
+#     for c in iter(lambda:o.read(1), b''):
+#         q.put(c)
+#     o.close()
+
+
 def getabit(o, q):
-    for c in iter(lambda:o.read(1), b''):
+    def getchar():
+        return o.read(1)
+    for c in iter(getchar, b''):
         q.put(c)
     o.close()
 
@@ -170,7 +178,7 @@ def test_func(s):
     # print ("----------PARSE------------")
     # print (s)
     # print ("~~~~~~~~~~~~~~~~~")
-    N = 11
+    N = 7
     for L in s.split():
         try:
             N = int(L.strip())
