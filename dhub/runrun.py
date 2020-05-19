@@ -135,6 +135,21 @@ def getdata(q):
     return r
 
 
+def test_func(s):
+    # print ("----------PARSE------------")
+    # print (s)
+    # print ("~~~~~~~~~~~~~~~~~")
+    N = 7
+    for L in s.split():
+        try:
+            N = int(L.strip())
+        except:
+            pass
+    # print ("RESULT:", N)
+    # print ("----------/PARSE------------")
+    return "BOOM " * N
+
+
 def run_interactive(cmd, input_func):
     pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, shell=True)
     q = Queue()
@@ -174,21 +189,6 @@ def run_interactive(cmd, input_func):
     pobj.wait(15)
 
 
-def test_func(s):
-    # print ("----------PARSE------------")
-    # print (s)
-    # print ("~~~~~~~~~~~~~~~~~")
-    N = 7
-    for L in s.split():
-        try:
-            N = int(L.strip())
-        except:
-            pass
-    # print ("RESULT:", N)
-    # print ("----------/PARSE------------")
-    return "BOOM " * N
-
-
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, shell=True)
@@ -196,30 +196,42 @@ class runner:
         self.t = Thread(target=getabit, args=(self.pobj.stdout, self.q))
         self.t.daemon = True
         self.t.start()
-
+        self.in_dat = ''
     #
     # call interact with user input, returns next process text+prompt
     #
     def interact(self, cmd=None):
-        if cmd:
+        if cmd:                                         #typically None for first interaction to get prompt
             self.pobj.stdin.write(bytes(cmd, 'utf-8'))
             self.pobj.stdin.write(b'\n')
             self.pobj.stdin.flush()
-        dat = getdata(self.q).decode('utf8')
-        while not dat:
-            dat = getdata(self.q).decode('utf8')
+            self.in_dat = cmd
+        o_dat = getdata(self.q).decode('utf8')
+        while not o_dat:
+            o_dat = getdata(self.q).decode('utf8')
             time.sleep(.1)
-        return dat
+        if o_dat.find(self.in_dat+"\n")==0:
+            o_dat=o_dat[len(self.in_dat)+1:]
+        # print ("LEN:", len(in_dat))
+        if o_dat[-1:]=="\n":
+            end = "\n"
+            o_dat = o_dat[:-1]
+        else:
+            end = ''
+        return o_dat
 
 
 if __name__=="__main__":
     cmd = "python testri.py"
     print (cmd)
     run = runner(cmd)
-    o = run.interact()
+    o = run.interact()                                  #get initial startup spam + prompt
     print ("$>%s<$" % o)
-    for i in range(3):
-        o = run.interact("Response %s" % i)
+    for i in range(4):
+        resp = test_func(o)
+        cmd = "Response %s %s" % (i, resp)
+        print ("~>%s<~" % cmd)
+        o = run.interact(cmd)                           #respond to process output+prompt with next command
         print ("$>%s<$" % o)
     print ("DONE")
 
