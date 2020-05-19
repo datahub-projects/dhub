@@ -202,9 +202,13 @@ class runner:
     #
     def interact(self, cmd=None):
         if cmd:                                         #typically None for first interaction to get prompt
+            print ("===%s==="%cmd)
             self.pobj.stdin.write(bytes(cmd, 'utf-8'))
             self.pobj.stdin.write(b'\n')
-            self.pobj.stdin.flush()
+            try:
+                self.pobj.stdin.flush()
+            except:
+                return None
             self.in_dat = cmd
         o_dat = getdata(self.q).decode('utf8')
         while not o_dat:
@@ -227,11 +231,13 @@ if __name__=="__main__":
     run = runner(cmd)
     o = run.interact()                                  #get initial startup spam + prompt
     print ("$>%s<$" % o)
-    for i in range(4):
+    for i in range(44):
         resp = test_func(o)
         cmd = "Response %s %s" % (i, resp)
         print ("~>%s<~" % cmd)
         o = run.interact(cmd)                           #respond to process output+prompt with next command
+        if o==None:
+            break
         print ("$>%s<$" % o)
     print ("DONE")
 
