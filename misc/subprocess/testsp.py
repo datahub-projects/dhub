@@ -28,33 +28,41 @@ def run_interactive(cmd, input_func):
     t = Thread(target=getabit, args=(pobj.stdout, q))
     t.daemon = True
     t.start()
-
+    in_dat=""
     while True:
         # print('Sleep for 1 second...')
         time.sleep(.4)#to ensure that the data will be processed completely
         o_dat = getdata(q).decode()
-        # print('Data received:' + o_dat)
-        if not t.isAlive():
+        if not o_dat:
             break
-        in_dat = input_func(o_dat)
-        pobj.stdin.write(bytes(in_dat, 'utf-8'))
-        pobj.stdin.write(b'\n')
-        pobj.stdin.flush()
+        # print("~%s~" % o_dat)
+        if o_dat.find(in_dat+"\n")==0:
+            o_dat=o_dat[len(in_dat)+1:]
+        # print ("LEN:", len(in_dat))
+        rows = o_dat.split("\n")
+        rows = "\n$ ".join(rows)
+        print(rows, end='')
+        if t.isAlive():
+            in_dat = input_func(o_dat)
+            print ("> %s"%in_dat)
+            pobj.stdin.write(bytes(in_dat, 'utf-8'))
+            pobj.stdin.write(b'\n')
+            pobj.stdin.flush()
     time.sleep(1)
     pobj.wait(15)
 
 
 def test_func(s):
-    print ("----------PARSE------------")
-    print (s)
-    print ("~~~~~~~~~~~~~~~~~")
+    # print ("----------PARSE------------")
+    # print (s)
+    # print ("~~~~~~~~~~~~~~~~~")
     for L in s.split():
         try:
             N = int(L.strip())
         except:
             pass
-    print ("RESULT:", N)
-    print ("----------/PARSE------------")
+    # print ("RESULT:", N)
+    # print ("----------/PARSE------------")
     return "BOOM " * N
 
 
