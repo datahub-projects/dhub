@@ -1,9 +1,10 @@
+import random
 print ("I've got a lot to say")
-print ("So get up & getaway")
+print ("So get up & getaway %s" % random.randint(0, 10))
 s = input('Hit me one time:')
 print(s)
 print ("Ipsum lorem")
-print ("Ipsum lorem")
+print ("Ipsum lorem getaway %s" % random.randint(0, 10))
 print ("Ipsum lorem")
 s = input('Hit me two time:')
 print(s)
