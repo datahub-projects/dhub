@@ -178,7 +178,7 @@ class runner:
         o_dat = getdata(self.q).decode('utf8')
         while not o_dat:
             o_dat = getdata(self.q).decode('utf8')
-            time.sleep(.41)
+            time.sleep(.1)
             if not self.t.isAlive():
                 trip-=1
                 if trip==0:
