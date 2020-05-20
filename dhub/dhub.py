@@ -49,6 +49,7 @@ mod_args.add_argument("--insist", action="store_true")
 rem_args = subparsers.add_parser('remote')
 rem_args.add_argument("url")
 rem_args.add_argument("--name")
+rem_args.add_argument("--port")
 rem_args.add_argument("--source")
 rem_args.add_argument("--sync", action="store_true")
 rem_args.add_argument("--dumb", action="store_true")
@@ -125,9 +126,15 @@ elif command=="remote":
         f.close()
     print ("Connecting to", url)
 
+    sshopts = '-T -v4'
+    if args.port:
+        sshopts += ' -p {0}'.format(args.port)
+    ssh = "ssh {0} {1}".format(sshopts, url)
+    print ("SSH",ssh)
+
     if args.source:
         f = open(args.source)
-        sub = runner("ssh -T "+url)
+        sub = runner(ssh)
         out = sub.interact()
         if "Permission denied" in out:
             print ("Problem logging in to %s" % url)
@@ -141,7 +148,7 @@ elif command=="remote":
         f.close()
 
     elif args.dumb:
-        sub = runner("ssh -T "+url)
+        sub = runner(ssh)
         out = sub.interact()
         while True:
             print (out)
@@ -160,7 +167,7 @@ elif command=="remote":
             if rwd[0]=='/':
                 rwd = rwd[1:]
             print(repo, branch, rwd)
-            sub = runner("ssh -T "+url)
+            sub = runner(ssh)
             out = sub.interact()
             if "Permission denied" in out:
                 print ("Problem logging in to %s" % url)
@@ -182,7 +189,7 @@ elif command=="remote":
                     print (out, end='')
 
     else:
-        subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
+        subprocess.call(ssh.replace("-T", '').split(), stdin=sys.stdin, stdout=sys.stdout)
     print ("Exit dhub")
 
 else:
