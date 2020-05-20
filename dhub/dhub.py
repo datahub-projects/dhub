@@ -166,8 +166,16 @@ elif command=="remote":
                 print ("Problem logging in to %s" % url)
             else:
                 out = sub.interact("cd %s; pwd" % rwd)
+                print (out, end='')
                 out = sub.interact("pwd")
                 print (out, end='')
+                out = sub.interact("git checkout {0}".format(branch))
+                if not out.find('fatal')==0:
+                    print (out, end='')
+                    out = sub.interact("git pull")
+                    print (out, end='')
+                    out = sub.interact("git log -n 1")
+                    print (out, end='')
 
     else:
         subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
