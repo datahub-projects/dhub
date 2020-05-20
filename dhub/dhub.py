@@ -167,7 +167,9 @@ elif command=="remote":
             else:
                 out = sub.interact("cd %s; pwd" % rwd)
                 print (out, end='')
-                out = sub.interact("pwd")
+                out = sub.interact("source ./venv/bin/activate; pwd")
+                print (out, end='')
+                out = sub.interact("pip install -r requirements.txt")
                 print (out, end='')
                 out = sub.interact("git checkout {0}".format(branch))
                 if not out.find('fatal')==0:
@@ -175,6 +177,8 @@ elif command=="remote":
                     out = sub.interact("git pull")
                     print (out, end='')
                     out = sub.interact("git log -n 1")
+                    print (out, end='')
+                    out = sub.interact("python3 dhub/dhub.py reqs --package mido")
                     print (out, end='')
 
     else:
