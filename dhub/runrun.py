@@ -128,8 +128,10 @@ def getdata(q):
         try:
             c = q.get(False)
         except Empty:
+            # print ("   EMPTY")
             break
         else:
+            # print ("   DATA")
             r += c
     return r
 
@@ -176,13 +178,13 @@ class runner:
         o_dat = getdata(self.q).decode('utf8')
         while not o_dat:
             o_dat = getdata(self.q).decode('utf8')
-            time.sleep(.1)
+            time.sleep(.41)
             if not self.t.isAlive():
                 trip-=1
                 if trip==0:
                     return ''
-            else:
-                print("-",trip)
+            # else:
+            #     print("-",trip)
 
         if o_dat.find(self.in_dat+"\n")==0:
             o_dat=o_dat[len(self.in_dat)+1:]

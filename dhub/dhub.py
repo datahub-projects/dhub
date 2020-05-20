@@ -51,6 +51,7 @@ rem_args.add_argument("url")
 rem_args.add_argument("--name")
 rem_args.add_argument("--source")
 rem_args.add_argument("--sync", action="store_true")
+rem_args.add_argument("--dumb", action="store_true")
 rem_args.add_argument("--debug", action="store_true")
 
 
@@ -139,6 +140,14 @@ elif command=="remote":
                 print (out, end='')
         f.close()
 
+    elif args.dumb:
+        sub = runner("ssh -T "+url)
+        out = sub.interact()
+        while True:
+            print (out)
+            inp = input(">>> ")
+            out = sub.interact(inp)
+
     elif args.sync:
         repo = get_repo()
         branch = get_branch()
@@ -156,12 +165,9 @@ elif command=="remote":
             if "Permission denied" in out:
                 print ("Problem logging in to %s" % url)
             else:
+                out = sub.interact("cd %s; pwd" % rwd)
                 out = sub.interact("pwd")
-                print ("[",out,"]", end='')
-                out = sub.interact("cd")
-                print ("[",out,"]", end='')
-                out = sub.interact("pwd")
-                print ("[",out,"]", end='')
+                print (out, end='')
 
     else:
         subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
