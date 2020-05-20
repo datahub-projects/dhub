@@ -2,7 +2,6 @@
 import os, sys, argparse, json, datetime, subprocess
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
-from runrun import runner
 
 #
 #the BDOL does not admire scripts which are also importable modules
@@ -18,7 +17,7 @@ sys.path.insert(0, abspath)
 
 from dhub import get_pip
 from dhub.mod_sync import sync, mod
-from dhub.runrun import git_status, get_author, get_username, get_branch
+from dhub.runrun import git_status, get_author, get_username, get_branch, get_repo, runner
 
 os.chdir(opath)
 
@@ -51,6 +50,7 @@ rem_args = subparsers.add_parser('remote')
 rem_args.add_argument("url")
 rem_args.add_argument("--name")
 rem_args.add_argument("--source")
+rem_args.add_argument("--sync", action="store_true")
 rem_args.add_argument("--debug", action="store_true")
 
 
@@ -138,6 +138,31 @@ elif command=="remote":
                 out = sub.interact(row)
                 print (out, end='')
         f.close()
+
+    elif args.sync:
+        repo = get_repo()
+        branch = get_branch()
+        home = os.path.expanduser('~')
+        cwd = os.getcwd()
+        if cwd.find(home) != 0:
+            print ("Home directory mismatch: {0} does not start with {1}".format(cwd, home))
+        else:
+            rwd = cwd[len(home):]
+            if rwd[0]=='/':
+                rwd = rwd[1:]
+            print(repo, branch, rwd)
+            sub = runner("ssh -T "+url)
+            out = sub.interact()
+            if "Permission denied" in out:
+                print ("Problem logging in to %s" % url)
+            else:
+                out = sub.interact("pwd")
+                print ("[",out,"]", end='')
+                out = sub.interact("cd")
+                print ("[",out,"]", end='')
+                out = sub.interact("pwd")
+                print ("[",out,"]", end='')
+
     else:
         subprocess.call(['ssh', url], stdin=sys.stdin, stdout=sys.stdout)
     print ("Exit dhub")

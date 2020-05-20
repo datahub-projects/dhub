@@ -86,6 +86,10 @@ def get_branch():
     out, err = git("rev-parse --abbrev-ref HEAD")
     return out.strip()
 
+def get_repo():
+    out, err = git("remote -v")
+    return out.split()[1]
+
 def get_author():
     return git("log -1 --pretty=format:'%an'")[0].strip().replace("'", "")
 
@@ -177,13 +181,16 @@ class runner:
                 trip-=1
                 if trip==0:
                     return ''
+            else:
+                print("-",trip)
+
         if o_dat.find(self.in_dat+"\n")==0:
             o_dat=o_dat[len(self.in_dat)+1:]
         return o_dat
 
 
 if __name__=="__main__":
-    cmd = "echo foo"
+    cmd = "cd"
     # cmd = "echoz foo"
     print (cmd, end="\n\n")
     run = runner(cmd)
