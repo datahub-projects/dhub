@@ -142,7 +142,7 @@ elif command=="remote":
             print(out)
             for row in f.readlines():
                 row.rstrip()
-                print (">>> " + row, end='')
+                print ("-~> " + row, end='')
                 out = sub.interact(row)
                 print (out, end='')
         f.close()
@@ -152,7 +152,7 @@ elif command=="remote":
         out = sub.interact()
         while True:
             print (out)
-            inp = input(">>> ")
+            inp = input("-~> ")
             out = sub.interact(inp)
 
     elif args.sync:
