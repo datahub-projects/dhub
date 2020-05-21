@@ -126,7 +126,7 @@ elif command=="remote":
         f.close()
     print ("Connecting to", url)
 
-    sshopts = '-T -v4'
+    sshopts = '-v4'
     if args.port:
         sshopts += ' -p {0}'.format(args.port)
     ssh = "ssh {0} {1}".format(sshopts, url)
@@ -189,7 +189,7 @@ elif command=="remote":
                     print (out, end='')
 
     else:
-        subprocess.call(ssh.replace("-T", '').split(), stdin=sys.stdin, stdout=sys.stdout)
+        subprocess.call(ssh.replace("-T", '').split())
     print ("Exit dhub")
 
 else:
