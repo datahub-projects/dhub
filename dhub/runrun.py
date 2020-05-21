@@ -176,9 +176,11 @@ class runner:
                 return ''
             self.in_dat = cmd
         o_dat = getdata(self.q).decode('utf8')
+        print("                                         O_DAT",o_dat.replace("\n","|").replace("\r",']'))
         while not o_dat:
             o_dat = getdata(self.q).decode('utf8')
-            time.sleep(.1)
+            print("                                         O_DAT", o_dat.replace("\n","|").replace("\r",']'))
+            time.sleep(1.1)
             if not self.t.isAlive():
                 trip-=1
                 if trip==0:
@@ -186,8 +188,11 @@ class runner:
             # else:
             #     print("-",trip)
 
-        if o_dat.find(self.in_dat+"\n")==0:
-            o_dat=o_dat[len(self.in_dat)+1:]
+        if o_dat.find(self.in_dat+"\r\n")==0:
+            print ("                                    YEP")
+            o_dat=o_dat[len(self.in_dat)+2:]
+        else:
+            print ("                                    NOPE", "-->%s<--"%self.in_dat)
         return o_dat
 
 
