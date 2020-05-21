@@ -151,8 +151,12 @@ elif command=="remote":
         sub = runner(ssh)
         out = sub.interact()
         while True:
-            print (out)
-            inp = input("-~> ")
+            rows = out.split("\n")
+            for row in rows[:-1]:
+                print (row)
+            for row in rows[-1:]:
+                print (row.upper(), end='')
+            inp = input('')
             out = sub.interact(inp)
 
     elif args.sync:
