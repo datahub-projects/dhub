@@ -188,12 +188,17 @@ class runner:
         print ("                                      O_DAT(0):", o_dat.replace("\r",']').replace("\n",'|'))
         p = parse_prompt(o_dat)
         print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
+        lastdat = time.time()
         while not o_dat or p!=self.prompt:
-            if p and not self.prompt and p[-1] == '$':      #Does it quack?
+            # if p and not self.prompt and p[-1] == '$':      #Does it quack?
+            if p and not self.prompt and time.time()-lastdat > .6:         # Does it oink?
                 self.prompt = p
                 print ("                                   SET:", p)
                 break
-            o_dat += get_sub_stdout(self.q).decode('utf8')
+            o_new = get_sub_stdout(self.q).decode('utf8')
+            o_dat+=o_new
+            if o_new:
+                lastdat = time.time()
             print("                                      O_DAT(1):", o_dat.replace("\r", ']').replace("\n", '|'))
             time.sleep(.1)
             p = parse_prompt(o_dat)
