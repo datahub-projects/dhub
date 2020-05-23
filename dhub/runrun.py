@@ -185,17 +185,19 @@ class runner:
                 return ''
             self.in_dat = cmd
         o_dat = get_sub_stdout(self.q).decode('utf8')
+        print ("                                      O_DAT(0):", o_dat.replace("\r",']').replace("\n",'|'))
         p = parse_prompt(o_dat)
-        # print("                                       LOOP:", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
+        print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
         while not o_dat or p!=self.prompt:
-            if p and not self.prompt:
+            if p and not self.prompt and p[-1] == '$':      #Does it quack?
                 self.prompt = p
-                # print ("                                   SET:", p)
+                print ("                                   SET:", p)
                 break
             o_dat += get_sub_stdout(self.q).decode('utf8')
+            print("                                      O_DAT(1):", o_dat.replace("\r", ']').replace("\n", '|'))
             time.sleep(.1)
             p = parse_prompt(o_dat)
-            # print("                                       LOOP:", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
+            print("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
     
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
