@@ -186,16 +186,16 @@ class runner:
             self.in_dat = cmd
         o_dat = get_sub_stdout(self.q).decode('utf8')
         p = parse_prompt(o_dat)
-        print("                                       LOOP:", "->%s<-->%s<-" % (len(p), self.prompt), p != self.prompt)
+        print("                                       LOOP:", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
         while not o_dat or p!=self.prompt:
             if p and not self.prompt:
                 self.prompt = p
-                print ("                                   SET:", len(p), type(p), list(p))
+                print ("                                   SET:", p)
                 break
-            o_dat = get_sub_stdout(self.q).decode('utf8')
+            o_dat += get_sub_stdout(self.q).decode('utf8')
             time.sleep(1.1)
             p = parse_prompt(o_dat)
-            print("                                       LOOP:", "->%s<-->%s<-" % (len(p), self.prompt),p!=self.prompt)
+            print("                                       LOOP:", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
     
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
