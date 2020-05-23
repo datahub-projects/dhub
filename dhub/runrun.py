@@ -187,35 +187,35 @@ class runner:
         o_dat = get_sub_stdout(self.q).decode('utf8')
         # print ("                                      O_DAT(0)-->%s<--" % o_dat.replace("\r",']').replace("\n",'|'))
         p = parse_prompt(o_dat)
-        print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
+        # print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
         lastdat = time.time()
-        ptry = 12
-        print ("WHILE"); sys.stdout.flush()
+        ptry = 42
+        # print ("WHILE"); sys.stdout.flush()
         while ptry and (not o_dat or p.find(self.prompt)==0):
             # print ("                     TIME: %s PTRY: %s" % (time.time()-lastdat,ptry))
             #Use advanced machine learning algorithms to ascertain if we have a prompt:
-            print(" " * 80 + "CHECK: |%s| p=%s self=%s p[-1]=%s t=%s" % (
-                    not not p and not self.prompt and p[-1] in '$#>:' and time.time() - lastdat > .6,
-            not not p, not self.prompt, p[-1:], time.time() - lastdat > .6))
+            # print(" " * 80 + "CHECK: |%s| p=%s self=%s p[-1]=%s t=%s" % (
+            #         not not p and not self.prompt and p[-1] in '$#>:' and time.time() - lastdat > .6,
+            #         not not p, not self.prompt, p[-1:], time.time() - lastdat > .6))
             if p and not self.prompt and p[-1] in '$#>:' and time.time()-lastdat > .6:  # Does it quack AND oink?
                 self.prompt = p
-                print ("                                   SET:", p)
+                # print ("                                   SET:", p)
                 break
             else:
                 ptry -= 1
                 if not ptry:
-                    print("                                   GIVE UP capturing prompt-->%s<--" % p)
+                    # print("                                   GIVE UP capturing prompt-->%s<--" % p)
                     break
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
             if o_new:
                 lastdat = time.time()
             # print ("                                      O_DAT(1)-->%s<--" % o_dat.replace("\r", ']').replace("\n", '|'))
-            time.sleep(.51)
+            time.sleep(.1)
             p = parse_prompt(o_dat)
-            print ("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
+            # print ("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
         if p==self.prompt:
-            print("                                   PROMPT:", p)
+            # print("                                   PROMPT:", p)
             pass
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:

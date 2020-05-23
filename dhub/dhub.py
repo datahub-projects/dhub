@@ -196,30 +196,16 @@ elif command=="process":
             if err:
                 print (out, end='')
             else:
-                print ("DBG A"); sys.stdout.flush()
                 subdo(sub, "cd %s; pwd" % rwd)
-                print ("DBG B"); sys.stdout.flush()
                 subdo(sub, "source ./venv/bin/activate; pwd")
-                print ("DBG C"); sys.stdout.flush()
                 out = subdo(sub, "pip install -r requirements.txt")
                 # print ("         OUT:", out, "|||")
                 if not out.find('ERROR')>=0:
-                    print("DBG D");
-                    sys.stdout.flush()
                     out = subdo(sub, "git checkout {0}".format(branch))
-                    print("DBG E");
-                    sys.stdout.flush()
                     if not out.find('fatal')>=0:
-                        print("DBG F");
-                        sys.stdout.flush()
                         out = subdo(sub, "git pull")
-                        print("DBG G");
-                        sys.stdout.flush()
                         out = subdo(sub, "git log -n 1")
-                        print("DBG H");
-                        sys.stdout.flush()
                         out = subdo(sub, "dhub reqs --package mido")
-                print ("DBG Z"); sys.stdout.flush()
 
     else:
         subprocess.call(shell.replace("-T", '').split())
