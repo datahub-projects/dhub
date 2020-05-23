@@ -126,7 +126,7 @@ elif command=="remote":
         f.close()
     print ("Connecting to", url)
 
-    sshopts = '-T -v4'
+    sshopts = '-tt -4'
     if args.port:
         sshopts += ' -p {0}'.format(args.port)
     ssh = "ssh {0} {1}".format(sshopts, url)
@@ -139,10 +139,10 @@ elif command=="remote":
         if "Permission denied" in out:
             print ("Problem logging in to %s" % url)
         else:
-            print(out)
+            print(out, end='')
             for row in f.readlines():
-                row.rstrip()
-                print ("-~> " + row, end='')
+                row = row.rstrip()
+                print (row, end='')
                 out = sub.interact(row)
                 print (out, end='')
         f.close()
@@ -151,8 +151,12 @@ elif command=="remote":
         sub = runner(ssh)
         out = sub.interact()
         while True:
-            print (out)
-            inp = input("-~> ")
+            rows = out.split("\n")
+            for row in rows[:-1]:
+                print (row)
+            for row in rows[-1:]:
+                print (row.upper(), end='')
+            inp = input('')
             out = sub.interact(inp)
 
     elif args.sync:
@@ -189,7 +193,7 @@ elif command=="remote":
                     print (out, end='')
 
     else:
-        subprocess.call(ssh.replace("-T", '').split(), stdin=sys.stdin, stdout=sys.stdout)
+        subprocess.call(ssh.replace("-T", '').split())
     print ("Exit dhub")
 
 else:

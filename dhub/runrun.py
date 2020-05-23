@@ -155,7 +155,7 @@ def test_func(s):
 
 class runner:
     def __init__(self, cmd):
-        self.pobj = sp.Popen(cmd, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT, shell=True)
+        self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
         self.q = Queue()
         self.t = Thread(target=getabit, args=(self.pobj.stdout, self.q))
         self.t.daemon = True
@@ -166,7 +166,8 @@ class runner:
     #
     def interact(self, cmd=None):
         trip = 3
-        if cmd:                                         #typically None for first interaction to get prompt
+        if cmd != None:                                   #typically None for first interaction to get prompt
+                                                          #if '', still need to write to stdin to keep rolling ball
             # print ("===%s==="%cmd)
             self.pobj.stdin.write(bytes(cmd, 'utf-8'))
             self.pobj.stdin.write(b'\n')
@@ -176,9 +177,10 @@ class runner:
                 return ''
             self.in_dat = cmd
         o_dat = getdata(self.q).decode('utf8')
+        # print("                                         O_DAT",o_dat.replace("\n","|").replace("\r",']'))
         while not o_dat:
             o_dat = getdata(self.q).decode('utf8')
-            time.sleep(.41)
+            time.sleep(.1)
             if not self.t.isAlive():
                 trip-=1
                 if trip==0:
@@ -186,8 +188,8 @@ class runner:
             # else:
             #     print("-",trip)
 
-        if o_dat.find(self.in_dat+"\n")==0:
-            o_dat=o_dat[len(self.in_dat)+1:]
+        if o_dat.find(self.in_dat+"\r\n")==0:
+            o_dat=o_dat[len(self.in_dat)+2:]
         return o_dat
 
 
