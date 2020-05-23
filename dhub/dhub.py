@@ -70,6 +70,11 @@ def interact_and_check(sub):
                 url if url else "localhost; you need to put your public key in authorized_keys (passwords won't work)\n"), True)
     return out, False
 
+def subdo(sub, s):
+    out = sub.interact(s)
+    print (out, end='')
+    return out
+
 command=None
 if len(sys.argv)>1:
     command=sys.argv[1]                          #really? is this the only way?
@@ -186,29 +191,25 @@ elif command=="process":
                 rwd = rwd[1:]
             print(repo, branch, rwd)
             sub = runner(shell)
-            out = sub.interact()
-            if "Permission denied" in out:
-                print ("Problem logging in to %s" % url)
+            # out = sub.interact()
+            out, err = interact_and_check(sub)
+            if err:
+                print (out, end='')
             else:
-                out = sub.interact("cd %s; pwd" % rwd)
-                print (out, end='')
-                out = sub.interact("source ./venv/bin/activate; pwd")
-                print (out, end='')
-                out = sub.interact("pip install -r requirements.txt")
-                print (out, end='')
-                out = sub.interact("git checkout {0}".format(branch))
-                if not out.find('fatal')==0:
-                    print (out, end='')
-                    out = sub.interact("git pull")
-                    print (out, end='')
-                    out = sub.interact("git log -n 1")
-                    print (out, end='')
-                    out = sub.interact("python3 dhub/dhub.py reqs --package mido")
-                    print (out, end='')
+                subdo(sub, "cd %s; pwd" % rwd)
+                subdo(sub, "source ./venv/bin/activate; pwd")
+                out = subdo(sub, "pip install -r requirements.txt")
+                # print ("         OUT:", out, "|||")
+                if not out.find('ERROR')>=0:
+                    out = subdo(sub, "git checkout {0}".format(branch))
+                    if not out.find('fatal')>=0:
+                        out = subdo(sub, "git pull")
+                        out = subdo(sub, "git log -n 1")
+                        out = subdo(sub, "dhub reqs --package mido")
 
     else:
         subprocess.call(shell.replace("-T", '').split())
-    print ("Exit dhub")
+    print ("\nExit dhub")
 
 else:
     parser.print_help()

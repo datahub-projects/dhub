@@ -189,7 +189,7 @@ class runner:
         p = parse_prompt(o_dat)
         # print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
         lastdat = time.time()
-        ptry = 10
+        ptry = 42
         while ptry and (not o_dat or p!=self.prompt):
             # print ("                     TIME: %s PTRY: %s" % (time.time()-lastdat,ptry))
             #Use advanced machine learning algorithms to ascertain if we have a prompt:
@@ -207,7 +207,7 @@ class runner:
             if o_new:
                 lastdat = time.time()
             # print ("                                      O_DAT(1)-->%s<--" % o_dat.replace("\r", ']').replace("\n", '|'))
-            time.sleep(.41)
+            time.sleep(.1)
             p = parse_prompt(o_dat)
             # print ("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
         if p==self.prompt:
