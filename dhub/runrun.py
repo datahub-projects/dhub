@@ -198,7 +198,7 @@ if __name__=="__main__":
     run = runner(cmd)
     o = run.interact()                                  #get initial startup spam + prompt
     print (o, end='')
-    for i in range(44):
+    while True:
         resp = test_func(o)
         cmd = "Response %s %s" % (i, resp)
         print ("--> %s" % cmd)
