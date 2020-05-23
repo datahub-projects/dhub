@@ -60,7 +60,7 @@ args = parser.parse_args()
 
 def interact_and_check(sub):
     out = sub.interact()
-    print("         OUT:", out)
+    # print("         OUT:", out)
     if (not hasattr(out, 'lower')) and out[1] == "NO_PROMPT":
         if "publickey" in out[0]:
             return ("SSH key issue logging in to %s" % (
@@ -143,7 +143,7 @@ elif command=="process":
         shell = "ssh {0} {1}".format(sshopts, url)
     else:
         shell = "ssh -tt -4 localhost"
-    print ("CMD", shell)
+    print ("SHELL COMMAND:", shell)
 
     if args.source:
         f = open(args.source)
