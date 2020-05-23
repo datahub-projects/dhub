@@ -58,6 +58,18 @@ proc_args.add_argument("--debug", action="store_true")
 
 args = parser.parse_args()
 
+def interact_and_check(sub):
+    out = sub.interact()
+    print("         OUT:", out)
+    if (not hasattr(out, 'lower')) and out[1] == "NO_PROMPT":
+        if "publickey" in out[0]:
+            return ("SSH key issue logging in to %s" % (
+                url if url else "localhost; you need to put your public key in authorized_keys\n"), True)
+        else:
+            return ("Problem logging in to %s" % (
+                url if url else "localhost; you need to put your public key in authorized_keys (passwords won't work)\n"), True)
+    return out, False
+
 command=None
 if len(sys.argv)>1:
     command=sys.argv[1]                          #really? is this the only way?
@@ -136,11 +148,9 @@ elif command=="process":
     if args.source:
         f = open(args.source)
         sub = runner(shell)
-        out = sub.interact()
-        if "Permission denied" in out:
-            print ("Problem logging in to %s" % url)
-        else:
-            print(out, end='')
+        out, err = interact_and_check(sub)
+        print(out, end='')
+        if not err:
             for row in f.readlines():
                 row = row.rstrip()
                 print (row, end='')
@@ -150,15 +160,18 @@ elif command=="process":
 
     elif args.dumb:
         sub = runner(shell)
-        out = sub.interact()
-        while True:
-            rows = out.split("\n")
-            for row in rows[:-1]:
-                print (row)
-            for row in rows[-1:]:
-                print (row.upper(), end='')
-            inp = input('')
-            out = sub.interact(inp)
+        out, err = interact_and_check(sub)
+        if err:
+            print(out, end='')
+        else:
+            while True:
+                rows = out.split("\n")
+                for row in rows[:-1]:
+                    print (row)
+                for row in rows[-1:]:
+                    print (row.upper(), end='')
+                inp = input('')
+                out = sub.interact(inp)
 
     elif args.sync:
         repo = get_repo()
