@@ -130,7 +130,7 @@ elif command=="process":
             sshopts += ' -p {0}'.format(args.port)
         shell = "ssh {0} {1}".format(sshopts, url)
     else:
-        shell = "bash"
+        shell = "ssh -tt -4 localhost"
     print ("CMD", shell)
 
     if args.source:
