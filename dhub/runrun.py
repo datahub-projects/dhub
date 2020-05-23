@@ -202,6 +202,9 @@ class runner:
                 # print ("                                   SET:", p)
                 break
             else:
+                if not not self.prompt and p.find(self.prompt) == 0:
+                    # print("                                   PROMPT:", p)
+                    break
                 ptry -= 1
                 if not ptry:
                     # print("                                   GIVE UP capturing prompt-->%s<--" % p)
@@ -214,9 +217,6 @@ class runner:
             time.sleep(.1)
             p = parse_prompt(o_dat)
             # print ("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
-        if p==self.prompt:
-            # print("                                   PROMPT:", p)
-            pass
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
