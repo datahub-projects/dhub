@@ -47,7 +47,7 @@ mod_args.add_argument("--debug", action="store_true")
 mod_args.add_argument("--insist", action="store_true")
 
 proc_args = subparsers.add_parser('process')
-proc_args.add_argument("url")
+proc_args.add_argument("--ssh")
 proc_args.add_argument("--name")
 proc_args.add_argument("--port")
 proc_args.add_argument("--source")
@@ -110,31 +110,32 @@ elif command=="sync":
     sync(show=args.debug, debug=args.debug)
 
 elif command=="process":
-    url = args.url
+    url = args.ssh
     #
     #  alias
     #
-    if args.name:
-        fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), args.name)
-        f = open(fn, 'w')               #FIXME create folders
-        f.write(url)
-        f.close()
-    fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), url)
-    if os.path.exists(fn):
-        f = open(fn)
-        url = f.read().strip()
-        f.close()
-    print ("Connecting to", url)
-
-    sshopts = '-tt -4'
-    if args.port:
-        sshopts += ' -p {0}'.format(args.port)
-    ssh = "ssh {0} {1}".format(sshopts, url)
-    print ("SSH",ssh)
+    if url:
+        if args.name:
+            fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), args.name)
+            f = open(fn, 'w')               #FIXME create folders
+            f.write(url)
+            f.close()
+        fn = "{0}/.dhub/names/{1}".format(os.path.expanduser("~"), url)
+        if os.path.exists(fn):
+            f = open(fn)
+            url = f.read().strip()
+            f.close()
+        sshopts = '-tt -4'
+        if args.port:
+            sshopts += ' -p {0}'.format(args.port)
+        shell = "ssh {0} {1}".format(sshopts, url)
+    else:
+        shell = "bash"
+    print ("CMD", shell)
 
     if args.source:
         f = open(args.source)
-        sub = runner(ssh)
+        sub = runner(shell)
         out = sub.interact()
         if "Permission denied" in out:
             print ("Problem logging in to %s" % url)
@@ -148,7 +149,7 @@ elif command=="process":
         f.close()
 
     elif args.dumb:
-        sub = runner(ssh)
+        sub = runner(shell)
         out = sub.interact()
         while True:
             rows = out.split("\n")
@@ -171,7 +172,7 @@ elif command=="process":
             if rwd[0]=='/':
                 rwd = rwd[1:]
             print(repo, branch, rwd)
-            sub = runner(ssh)
+            sub = runner(shell)
             out = sub.interact()
             if "Permission denied" in out:
                 print ("Problem logging in to %s" % url)
@@ -193,7 +194,7 @@ elif command=="process":
                     print (out, end='')
 
     else:
-        subprocess.call(ssh.replace("-T", '').split())
+        subprocess.call(shell.replace("-T", '').split())
     print ("Exit dhub")
 
 else:
