@@ -46,14 +46,14 @@ mod_args.add_argument("--message")
 mod_args.add_argument("--debug", action="store_true")
 mod_args.add_argument("--insist", action="store_true")
 
-rem_args = subparsers.add_parser('remote')
-rem_args.add_argument("url")
-rem_args.add_argument("--name")
-rem_args.add_argument("--port")
-rem_args.add_argument("--source")
-rem_args.add_argument("--sync", action="store_true")
-rem_args.add_argument("--dumb", action="store_true")
-rem_args.add_argument("--debug", action="store_true")
+proc_args = subparsers.add_parser('process')
+proc_args.add_argument("url")
+proc_args.add_argument("--name")
+proc_args.add_argument("--port")
+proc_args.add_argument("--source")
+proc_args.add_argument("--sync", action="store_true")
+proc_args.add_argument("--dumb", action="store_true")
+proc_args.add_argument("--debug", action="store_true")
 
 
 args = parser.parse_args()
@@ -109,7 +109,7 @@ elif command=="sync":
     _print_green("Synchronizing local git repository and working tree to remote/origin")
     sync(show=args.debug, debug=args.debug)
 
-elif command=="remote":
+elif command=="process":
     url = args.url
     #
     #  alias
