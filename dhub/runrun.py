@@ -1,4 +1,4 @@
-import  subprocess, time, os, sys
+import  subprocess, time, os, sys, re
 from blessings import Terminal
 bless_term = Terminal()
 
@@ -152,6 +152,15 @@ def get_sub_stdout(q):
             r += c
     return r
 
+def escape_ansi(line):
+    ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', line)
+
+def parse_prompt(out):
+    if out:
+        return escape_ansi(out).replace("\r", '').strip().split("\n")[-1]
+    return out
+
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -160,11 +169,11 @@ class runner:
         self.t.daemon = True
         self.t.start()
         self.in_dat = ''
+        self.prompt = ''
     #
     # call interact with user input, returns next process text+prompt
     #
     def interact(self, cmd=None):
-        trip = 3
         if cmd != None:                                   #typically None for first interaction to get prompt
                                                           #if '', still need to write to stdin to keep rolling ball
             # print ("===%s==="%cmd)
@@ -176,19 +185,20 @@ class runner:
                 return ''
             self.in_dat = cmd
         o_dat = get_sub_stdout(self.q).decode('utf8')
-        # print("                                         O_DAT",o_dat.replace("\n","|").replace("\r",']'))
-        while not o_dat:
+        p = parse_prompt(o_dat)
+        print("                                       LOOP:", "->%s<-->%s<-" % (len(p), self.prompt), p != self.prompt)
+        while not o_dat or p!=self.prompt:
+            if p and not self.prompt:
+                self.prompt = p
+                print ("                                   SET:", len(p), type(p), list(p))
+                break
             o_dat = get_sub_stdout(self.q).decode('utf8')
-            time.sleep(.1)
-            if not self.t.isAlive():
-                trip-=1
-                if trip==0:
-                    return ''
-            # else:
-            #     print("-",trip)
-
-        if o_dat.find(self.in_dat+"\r\n")==0:
-            o_dat=o_dat[len(self.in_dat)+2:]
+            time.sleep(1.1)
+            p = parse_prompt(o_dat)
+            print("                                       LOOP:", "->%s<-->%s<-" % (len(p), self.prompt),p!=self.prompt)
+    
+        # if o_dat.find(self.in_dat+"\r\n")==0:
+        #     o_dat=o_dat[len(self.in_dat)+2:]
         return o_dat
 
 
