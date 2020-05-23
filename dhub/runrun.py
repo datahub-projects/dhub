@@ -113,29 +113,6 @@ from queue import Queue, Empty
 import time
 
 
-def getabit(o, q):
-    def getchar():
-        return o.read(1)
-
-    for c in iter(getchar, b''):
-        q.put(c)
-    o.close()
-
-
-def getdata(q):
-    r = b''
-    while True:
-        try:
-            c = q.get(False)
-        except Empty:
-            # print ("   EMPTY")
-            break
-        else:
-            # print ("   DATA")
-            r += c
-    return r
-
-
 def test_func(s):
     if not s:
         return ""
@@ -153,11 +130,33 @@ def test_func(s):
     return "BOOM " * N
 
 
+def stdout_thread(o, q):
+    def getchar():
+        return o.read(1)
+
+    for c in iter(getchar, b''):
+        q.put(c)
+    o.close()
+
+
+def get_sub_stdout(q):
+    r = b''
+    while True:
+        try:
+            c = q.get(False)
+        except Empty:
+            # print ("   EMPTY")
+            break
+        else:
+            # print ("   DATA")
+            r += c
+    return r
+
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
         self.q = Queue()
-        self.t = Thread(target=getabit, args=(self.pobj.stdout, self.q))
+        self.t = Thread(target=stdout_thread, args=(self.pobj.stdout, self.q))
         self.t.daemon = True
         self.t.start()
         self.in_dat = ''
@@ -176,10 +175,10 @@ class runner:
             except:
                 return ''
             self.in_dat = cmd
-        o_dat = getdata(self.q).decode('utf8')
+        o_dat = get_sub_stdout(self.q).decode('utf8')
         # print("                                         O_DAT",o_dat.replace("\n","|").replace("\r",']'))
         while not o_dat:
-            o_dat = getdata(self.q).decode('utf8')
+            o_dat = get_sub_stdout(self.q).decode('utf8')
             time.sleep(.1)
             if not self.t.isAlive():
                 trip-=1
