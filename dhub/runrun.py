@@ -1,4 +1,4 @@
-import  subprocess, time, os, sys, re
+import  subprocess, time, os, sys, re, socket
 from blessings import Terminal
 bless_term = Terminal()
 
@@ -156,10 +156,27 @@ def escape_ansi(line):
     ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', line)
 
-def parse_prompt(out):
-    if out:
-        return escape_ansi(out).replace("\r", '').strip().split("\n")[-1]
-    return out
+
+# Use advanced machine learning algorithms to ascertain if we have a prompt:
+def is_a_prompt(s):                                         # A proud moment in hell
+    if "\n" in s:
+        s = s.split("\n")[-1]
+    s = escape_ansi(s.strip())
+    u = os.getlogin()
+    h = socket.gethostname()
+    i = h.find('.')
+    if i > 0:
+        h = h[:i]
+    i = s.find(u)
+    if i<0 or i>22:
+        # print ("NOT A PROMPT: user", u, s)
+        return False
+    i = s.find(h)
+    if i<0 or i>33:
+        # print ("NOT A PROMPT: host", h, s)
+        return False
+    # print("PROMPT returns", len(s) < 66, s)
+    return len(s) < 66
 
 class runner:
     def __init__(self, cmd):
@@ -169,7 +186,6 @@ class runner:
         self.t.daemon = True
         self.t.start()
         self.in_dat = ''
-        self.prompt = ''
     #
     # call interact with user input, returns next process text+prompt
     #
@@ -184,44 +200,15 @@ class runner:
             except:
                 return ''
             self.in_dat = cmd
-        o_dat = get_sub_stdout(self.q).decode('utf8')
-        # print ("                                      O_DAT(0)-->%s<--" % o_dat.replace("\r",']').replace("\n",'|'))
-        p = parse_prompt(o_dat)
-        # print("                                       LOOP(0):", "->%s<-->%s<-" % (p, self.prompt), p != self.prompt)
-        lastdat = time.time()
-        ptry = 42
-        # print ("WHILE"); sys.stdout.flush()
-        while ptry and (not o_dat or p.find(self.prompt)==0):
-            # print ("                     TIME: %s PTRY: %s" % (time.time()-lastdat,ptry))
-            #Use advanced machine learning algorithms to ascertain if we have a prompt:
-            # print(" " * 80 + "CHECK: |%s| p=%s self=%s p[-1]=%s t=%s" % (
-            #         not not p and not self.prompt and p[-1] in '$#>:' and time.time() - lastdat > .6,
-            #         not not p, not self.prompt, p[-1:], time.time() - lastdat > .6))
-            if p and not self.prompt and p[-1] in '$#>:' and time.time()-lastdat > .6:  # Does it quack AND oink?
-                self.prompt = p
-                # print ("                                   SET:", p)
-                break
-            else:
-                if not not self.prompt and p.find(self.prompt) == 0:
-                    # print("                                   PROMPT:", p)
-                    break
-                ptry -= 1
-                if not ptry:
-                    # print("                                   GIVE UP capturing prompt-->%s<--" % p)
-                    break
+        o_new = get_sub_stdout(self.q).decode('utf8')
+        o_dat = ""
+        while not is_a_prompt(o_new):
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
-            if o_new:
-                lastdat = time.time()
-            # print ("                                      O_DAT(1)-->%s<--" % o_dat.replace("\r", ']').replace("\n", '|'))
             time.sleep(.1)
-            p = parse_prompt(o_dat)
-            # print ("                                       LOOP:(1)", "->%s<-->%s<-" % (p, self.prompt),p!=self.prompt)
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
-        if self.prompt=='':
-            return o_dat, "NO_PROMPT"
         return o_dat
 
 
