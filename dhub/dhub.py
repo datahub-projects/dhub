@@ -59,19 +59,6 @@ proc_args.add_argument("--debug", action="store_true")
 
 args = parser.parse_args()
 
-def interact_and_check(sub):
-    out = sub.interact()
-    # print("         OUT:", out)
-    if (not hasattr(out, 'lower')) and out[1] == "NO_PROMPT":
-        print (out[0])
-        if "publickey" in out[0]:
-            return ("SSH key issue logging in to %s" % (
-                url if url else "localhost; you need to put your public key in authorized_keys\n"), True)
-        else:
-            return ("Problem logging in to %s" % (
-                url if url else "localhost; you need to put your public key in authorized_keys (passwords won't work)\n"), True)
-    return out, False
-
 def subdo(sub, s):
     _print_green("\n-~> %s" % s.rstrip())
     out = sub.interact(s)
@@ -157,7 +144,7 @@ elif command=="process":
     if args.source:
         f = open(args.source)
         sub = runner(shell)
-        out, err = interact_and_check(sub)
+        out, err = sub.first()
         print(out, end='')
         if not err:
             for row in f.readlines():
@@ -169,11 +156,12 @@ elif command=="process":
 
     elif args.dumb:
         sub = runner(shell)
-        out, err = interact_and_check(sub)
+        out, err = sub.first()
         if err:
             print(out, end='')
         else:
             while True:
+                print ("DBG B")
                 rows = out.split("\n")
                 for row in rows[:-1]:
                     print (row)
@@ -198,7 +186,7 @@ elif command=="process":
             home = os.path.expanduser('~')
             sub = runner(shell)
             # out = sub.interact()
-            out, err = interact_and_check(sub)
+            out, err = sub.first()
             if err:
                 print (out, end='')
                 break

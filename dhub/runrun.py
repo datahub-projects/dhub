@@ -153,33 +153,13 @@ def get_sub_stdout(q):
     return r
 
 def escape_ansi(line):
-    ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    # ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', line)
 
 
-# Use advanced machine learning algorithms to ascertain if we have a prompt:
-def is_a_prompt(s):                                         # A proud moment in hell
-#    print ("SSS:", s)
-    if "\n" in s:
-        s = s.split("\n")[-1]
-    s = escape_ansi(s.strip())
-    u = os.getlogin()
-    h = socket.gethostname()
-    i = h.find('.')
-    if i > 0:
-        h = h[:i]
-    i = s.find(u)
-    if i<0 or i>22:
-#        print ("NOT A PROMPT: user", u, s)
-        return False
-    i = s.find(h)
-    if i<0 or i>33:
-#        print ("NOT A PROMPT: host", h, s)
-        return False
-    # print("PROMPT returns", len(s) < 66, s)
-    return len(s) < 99
-
 PROMPT_TIMEOUT = 8
+SLEEPYTIME = .1
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -188,8 +168,21 @@ class runner:
         self.t.daemon = True
         self.t.start()
         self.in_dat = ''
-        self.prompted = False
         self.t0 = time.time()
+
+    # Use advanced machine learning algorithms to ascertain if we have a prompt:
+    def has_prompt(self, s):  # A proud moment in hell
+        print ("SSS:", s)
+        if "\n" in s:
+            s = s.split("\n")[-1]
+        s = escape_ansi(s.strip())
+        i = s.find(self.prompt)
+        if i > 12:
+            print ("FAIL")
+            return False
+        print("PROMPT FOUND")
+        return True
+
     #
     # call interact with user input, returns next process text+prompt
     #
@@ -206,18 +199,38 @@ class runner:
             self.in_dat = cmd
         o_new = get_sub_stdout(self.q).decode('utf8')
         o_dat = ""
-        while not is_a_prompt(o_new):
+        while not self.has_prompt(o_new):
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
-            time.sleep(.1)
+            time.sleep(SLEEPYTIME)
             if not self.prompted:
                 if time.time() - self.t0 > PROMPT_TIMEOUT:
                     return o_dat, "NO_PROMPT"
-        self.prompted = True
+        print ("DBG A")
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
         return o_dat
+
+    def first(self):
+        o_dat = ""
+        while True:
+            o_dat += get_sub_stdout(self.q).decode('utf8')
+            spl = o_dat.rstrip().split("\n")
+            if len(spl) >= 2 and "last login" in spl[-2].lower():
+                break
+            time.sleep(SLEEPYTIME)
+        # print (o_dat)
+        prompt = escape_ansi(spl[-1])
+        prompt.replace("\r", ']').strip()
+        i = prompt.find(':')
+        if i > 0:
+            print ("III:", i)
+            prompt = prompt[0:i+1]
+        self.prompt = prompt
+        print ("PROMPT: >>>%s<<<" % prompt)
+        sys.stdout.flush()
+        return o_dat, False
 
     def exit(self):
         self.pobj.stdin.write(bytes('exit', 'utf-8'))
@@ -228,20 +241,14 @@ class runner:
         sys.stdout.flush()
 
 if __name__=="__main__":
-    cmd = "cd"
+    cmd = "ssh -tt -4 localhost"
     # cmd = "echoz foo"
     print (cmd, end="\n\n")
     run = runner(cmd)
-    o = run.interact()                                  #get initial startup spam + prompt
-    print (o, end='')
-    while True:
-        resp = test_func(o)
-        cmd = "Response %s %s" % (i, resp)
-        print ("--> %s" % cmd)
-        o = run.interact(cmd)                           #respond to process output+prompt with next command
-        if not o:
-            break
-        print(o, end='')
+    o = run.first()                                  #get initial startup spam + prompt
+    print (o)
+    run.interact("pwd")
+    run.exit()
     print ("DONE")
 
 # if __name__ == "__main__":
