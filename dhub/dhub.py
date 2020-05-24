@@ -51,7 +51,8 @@ proc_args.add_argument("--ssh")
 proc_args.add_argument("--name")
 proc_args.add_argument("--port")
 proc_args.add_argument("--source")
-proc_args.add_argument("--sync", action="store_true")
+proc_args.add_argument("--command", default="python entrypoint.py")
+proc_args.add_argument("--gitsync") #=path to proj or .
 proc_args.add_argument("--dumb", action="store_true")
 proc_args.add_argument("--debug", action="store_true")
 
@@ -74,6 +75,7 @@ def interact_and_check(sub):
 def subdo(sub, s):
     out = sub.interact(s)
     print (out, end='')
+    sys.stdout.flush()
     return out
 
 command=None
@@ -182,35 +184,39 @@ elif command=="process":
                 out = sub.interact(inp)
         sub.exit()
 
-    elif args.sync:
-        repo = get_repo()
-        branch = get_branch()
-        home = os.path.expanduser('~')
-        cwd = os.getcwd()
-        if cwd.find(home) != 0:
-            print ("Home directory mismatch: {0} does not start with {1}".format(cwd, home))
-        else:
-            rwd = cwd[len(home):]
-            if rwd[0]=='/':
-                rwd = rwd[1:]
-            print(repo, branch, rwd)
+    elif args.gitsync:
+        for i in range(1): #allows break
+            repo = get_repo()
+            if not repo:
+                print ("Not a git repository")
+                break
+            proj = repo[repo.rfind('/')+1:] #FIXME make me smarter -- multi-folder project
+            if args.gitsync != '.':
+                proj = args.gitsync
+            branch = get_branch()
+            home = os.path.expanduser('~')
             sub = runner(shell)
             # out = sub.interact()
             out, err = interact_and_check(sub)
             if err:
                 print (out, end='')
-            else:
-                subdo(sub, "cd %s; pwd" % rwd)
-                subdo(sub, "source ./venv/bin/activate; pwd")
-                out = subdo(sub, "pip install -r requirements.txt")
-                # print ("         OUT:", out, "|||")
-                if not out.find('ERROR')>=0:
-                    out = subdo(sub, "git checkout {0}".format(branch))
-                    if not out.find('fatal')>=0:
-                        out = subdo(sub, "git pull")
-                        out = subdo(sub, "git log -n 1")
-                        out = subdo(sub, "dhub reqs --package mido")
-            sub.exit()
+                break
+            subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj))
+            subdo(sub, "cd %s" % proj)
+            subdo(sub, "virtualenv -p python3 venv")
+            subdo(sub, "source ./venv/bin/activate")
+            out = subdo(sub, "pip install -r requirements.txt")
+            if out.find('ERROR')>=0:
+                print ("gitsync quitting on error", end='')
+                break
+            out = subdo(sub, "git checkout {0}".format(branch))
+            if out.find('fatal')>=0:
+                print ("gitsync quitting on error", end='')
+                break
+            subdo(sub, "git pull")
+            subdo(sub, "git log -n 1")
+            out = subdo(sub, args.command)
+        sub.exit()
     else:
         subprocess.call(shell.replace("-T", '').split())
     print ("\nExit dhub")
