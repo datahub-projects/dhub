@@ -172,15 +172,15 @@ class runner:
 
     # Use advanced machine learning algorithms to ascertain if we have a prompt:
     def has_prompt(self, s):  # A proud moment in hell
-        print ("SSS:", s)
+        # print ("SSS:", s)
         if "\n" in s:
             s = s.split("\n")[-1]
         s = escape_ansi(s.strip())
         i = s.find(self.prompt)
-        if i > 12:
-            print ("FAIL")
+        if i<0  or i>12:
+            # print ("FAIL")
             return False
-        print("PROMPT FOUND")
+        # print("PROMPT FOUND")
         return True
 
     #
@@ -203,10 +203,7 @@ class runner:
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
             time.sleep(SLEEPYTIME)
-            if not self.prompted:
-                if time.time() - self.t0 > PROMPT_TIMEOUT:
-                    return o_dat, "NO_PROMPT"
-        print ("DBG A")
+        # print ("DBG A")
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
@@ -225,7 +222,7 @@ class runner:
         prompt.replace("\r", ']').strip()
         i = prompt.find(':')
         if i > 0:
-            print ("III:", i)
+            # print ("III:", i)
             prompt = prompt[0:i+1]
         self.prompt = prompt
         print ("PROMPT: >>>%s<<<" % prompt)
