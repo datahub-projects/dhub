@@ -73,6 +73,7 @@ def interact_and_check(sub):
     return out, False
 
 def subdo(sub, s):
+    _print_green("\n-~> %s" % s.rstrip())
     out = sub.interact(s)
     print (out, end='')
     sys.stdout.flush()
