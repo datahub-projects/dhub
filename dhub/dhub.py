@@ -161,7 +161,6 @@ elif command=="process":
             print(out, end='')
         else:
             while True:
-                print ("DBG B")
                 rows = out.split("\n")
                 for row in rows[:-1]:
                     print (row)
