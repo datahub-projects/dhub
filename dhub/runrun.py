@@ -159,6 +159,7 @@ def escape_ansi(line):
 
 # Use advanced machine learning algorithms to ascertain if we have a prompt:
 def is_a_prompt(s):                                         # A proud moment in hell
+#    print ("SSS:", s)
     if "\n" in s:
         s = s.split("\n")[-1]
     s = escape_ansi(s.strip())
@@ -169,15 +170,16 @@ def is_a_prompt(s):                                         # A proud moment in 
         h = h[:i]
     i = s.find(u)
     if i<0 or i>22:
-        # print ("NOT A PROMPT: user", u, s)
+#        print ("NOT A PROMPT: user", u, s)
         return False
     i = s.find(h)
     if i<0 or i>33:
-        # print ("NOT A PROMPT: host", h, s)
+#        print ("NOT A PROMPT: host", h, s)
         return False
     # print("PROMPT returns", len(s) < 66, s)
-    return len(s) < 66
+    return len(s) < 99
 
+PROMPT_TIMEOUT = 8
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -186,6 +188,8 @@ class runner:
         self.t.daemon = True
         self.t.start()
         self.in_dat = ''
+        self.prompted = False
+        self.t0 = time.time()
     #
     # call interact with user input, returns next process text+prompt
     #
@@ -206,11 +210,22 @@ class runner:
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
             time.sleep(.1)
+            if not self.prompted:
+                if time.time() - self.t0 > PROMPT_TIMEOUT:
+                    return o_dat, "NO_PROMPT"
+        self.prompted = True
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
         return o_dat
 
+    def exit(self):
+        self.pobj.stdin.write(bytes('exit', 'utf-8'))
+        self.pobj.stdin.write(b'\n')
+        time.sleep(2)
+        o_new = get_sub_stdout(self.q).decode('utf8')
+        print (o_new)
+        sys.stdout.flush()
 
 if __name__=="__main__":
     cmd = "cd"

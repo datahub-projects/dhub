@@ -62,6 +62,7 @@ def interact_and_check(sub):
     out = sub.interact()
     # print("         OUT:", out)
     if (not hasattr(out, 'lower')) and out[1] == "NO_PROMPT":
+        print (out[0])
         if "publickey" in out[0]:
             return ("SSH key issue logging in to %s" % (
                 url if url else "localhost; you need to put your public key in authorized_keys\n"), True)
@@ -176,7 +177,10 @@ elif command=="process":
                 for row in rows[-1:]:
                     print (row.upper(), end='')
                 inp = input('')
+                if inp=='exit':
+                    break
                 out = sub.interact(inp)
+        sub.exit()
 
     elif args.sync:
         repo = get_repo()
@@ -206,7 +210,7 @@ elif command=="process":
                         out = subdo(sub, "git pull")
                         out = subdo(sub, "git log -n 1")
                         out = subdo(sub, "dhub reqs --package mido")
-
+            sub.exit()
     else:
         subprocess.call(shell.replace("-T", '').split())
     print ("\nExit dhub")
