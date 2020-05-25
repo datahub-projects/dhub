@@ -52,18 +52,17 @@ proc_args.add_argument("--name")
 proc_args.add_argument("--port")
 proc_args.add_argument("--source")
 proc_args.add_argument("--command", default="python entrypoint.py")
-proc_args.add_argument("--gitsync") #=path to proj or .
+proc_args.add_argument("--git") #=path to proj or .
 proc_args.add_argument("--dumb", action="store_true")
 proc_args.add_argument("--debug", action="store_true")
 
 
 args = parser.parse_args()
 
-def subdo(sub, s):
+def subdo(sub, s, expect=None):
     _print_green("\n-~> %s" % s.rstrip())
-    out = sub.interact(s)
+    out = sub.interact(s, expect)
     print (out, end='')
-    sys.stdout.flush()
     return out
 
 command=None
@@ -172,7 +171,7 @@ elif command=="process":
                 out = sub.interact(inp)
         sub.exit()
 
-    elif args.gitsync:
+    elif args.git:
         sub = None
         for i in range(1): #allows break
             repo = get_repo()
@@ -180,12 +179,12 @@ elif command=="process":
                 print ("Not a git repository")
                 break
             proj = repo[repo.rfind('/')+1:] #FIXME make me smarter -- multi-folder project
-            if args.gitsync == '.':
+            if args.git == '.':
                 if not args.ssh:
                     print ("You probably don't want to remove your local checkout")
                     break
             else:
-                proj = args.gitsync
+                proj = args.git
             branch = get_branch()
             home = os.path.expanduser('~')
             sub = runner(shell)
@@ -194,7 +193,15 @@ elif command=="process":
             if err:
                 break
             subdo(sub, "rm -fr %s" % proj)
-            out = subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj))
+            out = subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj), expect=["yes/no", "repository exists"])
+            if "yes/no" in out:
+                print ("\n\nDHUB: Must establish the legitimacy of the git repository's public key.")
+                print("Log in to the remote server and try 'git fetch' to establish the key in known_hosts.")
+                break
+            if "repository exists" in out:
+                print ("\n\nDHUB: Need to set up server's git public key for this repository.")
+                print("Alternatively, use read-only publicly accessible repo.")
+                break
             subdo(sub, "cd %s" % proj)
             if "fatal" in out:
                 break
@@ -205,7 +212,7 @@ elif command=="process":
                 subdo(sub, "source ./venv/bin/activate")
                 out = subdo(sub, "pip install -r requirements.txt")
                 if out.find('ERROR')>=0:
-                    print ("gitsync quitting on error", end='')
+                    print ("quitting on error", end='')
                     break
                 subdo(sub, args.command)
             else:

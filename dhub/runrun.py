@@ -186,7 +186,7 @@ class runner:
     #
     # call interact with user input, returns next process text+prompt
     #
-    def interact(self, cmd=None):
+    def interact(self, cmd=None, expect=None):
         if cmd != None:                                   #typically None for first interaction to get prompt
                                                           #if '', still need to write to stdin to keep rolling ball
             # print ("===%s==="%cmd)
@@ -197,9 +197,23 @@ class runner:
             except:
                 return ''
             self.in_dat = cmd
+
+        if expect==None:
+            expect=[]
+        elif hasattr(expect, "lower"):
+            expect = [expect]
+        # print ("EXPECT:", expect)
         o_new = get_sub_stdout(self.q).decode('utf8')
-        o_dat = ""
+        o_dat = o_new
         while not self.has_prompt(o_new):
+            br = False
+            for ex in expect:
+                # print ("TEST:", ex, o_new, "||", ex in o_new, "|||")
+                if ex in o_new:                           #additional triggers to return such as Y/n prompts
+                    br = True
+                    break
+            if br:
+                break
             o_new = get_sub_stdout(self.q).decode('utf8')
             o_dat += o_new
             time.sleep(SLEEPYTIME)
