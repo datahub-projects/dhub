@@ -173,6 +173,7 @@ elif command=="process":
         sub.exit()
 
     elif args.gitsync:
+        sub = None
         for i in range(1): #allows break
             repo = get_repo()
             if not repo:
@@ -211,7 +212,8 @@ elif command=="process":
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
                 subdo(sub, "docker run --rm %s" % proj)
-        sub.exit()
+        if sub:
+            sub.exit()
     else:
         subprocess.call(shell.replace("-T", '').split())
     print ("\nExit dhub")
