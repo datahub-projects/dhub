@@ -165,7 +165,7 @@ elif command=="process":
                 for row in rows[:-1]:
                     print (row)
                 for row in rows[-1:]:
-                    print (row.upper(), end='')
+                    print ("DUMB:", row, end='')
                 inp = input('')
                 if inp=='exit':
                     break
