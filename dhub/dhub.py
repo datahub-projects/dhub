@@ -179,31 +179,38 @@ elif command=="process":
                 print ("Not a git repository")
                 break
             proj = repo[repo.rfind('/')+1:] #FIXME make me smarter -- multi-folder project
-            if args.gitsync != '.':
+            if args.gitsync == '.':
+                if not args.ssh:
+                    print ("You probably don't want to remove your local checkout")
+                    break
+            else:
                 proj = args.gitsync
             branch = get_branch()
             home = os.path.expanduser('~')
             sub = runner(shell)
-            # out = sub.interact()
             out, err = sub.first()
+            print(out, end='')
             if err:
-                print (out, end='')
                 break
-            subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj))
+            subdo(sub, "rm -fr %s" % proj)
+            out = subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj))
             subdo(sub, "cd %s" % proj)
-            subdo(sub, "virtualenv -p python3 venv")
-            subdo(sub, "source ./venv/bin/activate")
-            out = subdo(sub, "pip install -r requirements.txt")
-            if out.find('ERROR')>=0:
-                print ("gitsync quitting on error", end='')
+            if "fatal" in out:
                 break
-            out = subdo(sub, "git checkout {0}".format(branch))
-            if out.find('fatal')>=0:
-                print ("gitsync quitting on error", end='')
-                break
-            subdo(sub, "git pull")
-            subdo(sub, "git log -n 1")
-            out = subdo(sub, args.command)
+            out = subdo(sub, """python3 -c 'import os; print(os.path.exists("Dockerfile"))'""")
+            if "False" in out:
+                print ("No docker file found; setting up virtualenv")
+                subdo(sub, "virtualenv -p python3 venv")
+                subdo(sub, "source ./venv/bin/activate")
+                out = subdo(sub, "pip install -r requirements.txt")
+                if out.find('ERROR')>=0:
+                    print ("gitsync quitting on error", end='')
+                    break
+                subdo(sub, args.command)
+            else:
+                print("Dockerfile found; building docker image")
+                subdo(sub, "docker build . -t %s" % proj)
+                subdo(sub, "docker run --rm %s" % proj)
         sub.exit()
     else:
         subprocess.call(shell.replace("-T", '').split())
