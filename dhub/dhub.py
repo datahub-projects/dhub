@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, argparse, json, datetime, subprocess
+import os, sys, argparse, json, time, datetime, subprocess
 from dateutil.parser import parse as parsedate
 from blessings import Terminal
 
@@ -17,7 +17,7 @@ sys.path.insert(0, abspath)
 
 from dhub import get_pip
 from dhub.mod_sync import sync, mod
-from dhub.runrun import git_status, get_author, get_username, get_branch, get_repo, runner
+from dhub.runrun import git_status, get_author, get_username, get_branch, get_repo, run, runner
 
 os.chdir(opath)
 
@@ -53,11 +53,38 @@ proc_args.add_argument("--port")
 proc_args.add_argument("--source")
 proc_args.add_argument("--command", default="python entrypoint.py")
 proc_args.add_argument("--git") #=path to proj or .
+proc_args.add_argument("--wake") #instance ID
 proc_args.add_argument("--dumb", action="store_true")
 proc_args.add_argument("--debug", action="store_true")
 
 
 args = parser.parse_args()
+
+def wake_up(inst):
+    if inst:
+        cmd = ("aws ec2 start-instances --instance-ids %s" % inst).split()
+        cmd2 = ("aws ec2 describe-instance-status --include-all-instances --instance-ids %s" % inst).split()
+        _print_green(' '.join(cmd))
+        out, ok = run(cmd)
+        print (out)
+        print ("Waiting for %s to arise" % inst)
+        while True:
+            out, ok = run(cmd2)
+            j = json.loads(out)
+            print ("AWAIT:", j['InstanceStatuses'][0]['InstanceId']==inst, j['InstanceStatuses'][0]['InstanceState']['Name']=='running')
+            if j['InstanceStatuses'][0]['InstanceId']==inst and j['InstanceStatuses'][0]['InstanceState']['Name']=='running':
+                break
+
+            time.sleep(10)
+        time.sleep(10)
+        print ("Instance %s is up & running" % inst)
+
+#FIXME should be done solely on remote
+def go_to_sleep(inst):
+    cmd = "aws ec2 stop-instances --instance-ids %s" % inst
+    print (cmd)
+    sys.stdout.flush()
+    os.system(cmd)
 
 def subdo(sub, s, expect=None):
     _print_green("\n-~> %s" % s.rstrip())
@@ -142,6 +169,7 @@ elif command=="process":
 
     if args.source:
         f = open(args.source)
+        wake_up(args.wake)
         sub = runner(shell)
         out, err = sub.first()
         print(out, end='')
@@ -154,6 +182,7 @@ elif command=="process":
         f.close()
 
     elif args.dumb:
+        wake_up(args.wake)
         sub = runner(shell)
         out, err = sub.first()
         if err:
@@ -187,7 +216,9 @@ elif command=="process":
                 proj = args.git
             branch = get_branch()
             home = os.path.expanduser('~')
+            wake_up(args.wake)
             sub = runner(shell)
+            _print_green (shell)
             out, err = sub.first()
             print(out, end='')
             if err:
@@ -221,6 +252,8 @@ elif command=="process":
                 subdo(sub, "docker run --rm %s" % proj)
         if sub:
             sub.exit()
+        if args.wake:
+            go_to_sleep(args.wake)
     else:
         subprocess.call(shell.replace("-T", '').split())
     print ("\nExit dhub")
