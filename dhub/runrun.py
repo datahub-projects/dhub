@@ -196,7 +196,8 @@ class runner:
                 self.pobj.stdin.flush()
             except:
                 return ''
-            self.in_dat = cmd
+        print("INP-->%s<--" % cmd.replace("\r", ']'))
+        self.in_dat = cmd
 
         if expect==None:
             expect=[]
@@ -204,6 +205,7 @@ class runner:
             expect = [expect]
         # print ("EXPECT:", expect)
         o_new = get_sub_stdout(self.q).decode('utf8')
+        print ("\n", o_new.find("\r"), "---------------------\nNEW1-->%s<--\n~~~~~~~~~~~~~~~~~~~~~\n"%o_new.replace("\r",']'))
         o_dat = o_new
         while not self.has_prompt(o_new):
             br = False
@@ -215,6 +217,7 @@ class runner:
             if br:
                 break
             o_new = get_sub_stdout(self.q).decode('utf8')
+            print("\n", o_new.find("\r"), "---------------------\nNEW2-->%s<--\n~~~~~~~~~~~~~~~~~~~~~\n" % o_new.replace("\r", ']'))
             o_dat += o_new
             time.sleep(SLEEPYTIME)
         # print ("DBG A")
@@ -226,7 +229,9 @@ class runner:
     def first(self):
         o_dat = ""
         while True:
-            o_dat += get_sub_stdout(self.q).decode('utf8')
+            o_new = get_sub_stdout(self.q).decode('utf8')
+            print("\n", o_new.find("\r"), "---------------------\nNEW0-->%s<--\n~~~~~~~~~~~~~~~~~~~~~\n" % o_new.replace("\r", ']'))
+            o_dat += o_new
             spl = o_dat.rstrip().split("\n")
             if len(spl) >= 2 and "last login" in spl[-2].lower():
                 break
