@@ -205,7 +205,7 @@ class runner:
         # print ("EXPECT:", expect)
         o_new = get_sub_stdout(self.q).decode('utf8')
         o_dat = o_new
-        while not self.has_prompt(o_new):
+        while not o_new:
             br = False
             for ex in expect:
                 # print ("TEST:", ex, o_new, "||", ex in o_new, "|||")
@@ -221,7 +221,7 @@ class runner:
         # remove echo:
         # if o_dat.find(self.in_dat+"\r\n")==0:
         #     o_dat=o_dat[len(self.in_dat)+2:]
-        return o_dat
+        return o_dat, self.has_prompt(o_dat)
 
     def first(self):
         o_dat = ""

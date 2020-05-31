@@ -82,15 +82,21 @@ def wake_up(inst):
 #FIXME should be done solely on remote
 def go_to_sleep(inst):
     cmd = "aws ec2 stop-instances --instance-ids %s" % inst
-    print (cmd)
+    _print_green(cmd)
     sys.stdout.flush()
     os.system(cmd)
 
 def subdo(sub, s, expect=None):
     _print_green("\n-~> %s" % s.rstrip())
-    out = sub.interact(s, expect)
-    print (out, end='')
-    return out
+    done = False
+    ret = ""
+    while not done:
+        out, done = sub.interact(s, expect)
+        print (out, end='')
+        ret += out
+        s = None
+    return ret
+
 
 command=None
 if len(sys.argv)>1:
@@ -254,7 +260,7 @@ elif command=="process":
             else:
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
-                subdo(sub, "docker run --rm %s" % proj)
+                subdo(sub, "docker run --rm -it %s" % proj)
         if sub:
             sub.exit()
         if args.wake:
