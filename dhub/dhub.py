@@ -75,8 +75,8 @@ def wake_up(inst):
             if j['InstanceStatuses'][0]['InstanceId']==inst and j['InstanceStatuses'][0]['InstanceState']['Name']=='running':
                 break
 
-            time.sleep(10)
-        time.sleep(10)
+            time.sleep(5)
+        time.sleep(20)
         print ("Instance %s is up & running" % inst)
 
 #FIXME should be done solely on remote
@@ -159,7 +159,7 @@ elif command=="process":
             f = open(fn)
             url = f.read().strip()
             f.close()
-        sshopts = '-tt -4'
+        sshopts = '-tt -4 -o ConnectTimeout=10 -o BatchMode=yes -o ServerAliveInterval=60'
         if args.port:
             sshopts += ' -p {0}'.format(args.port)
         shell = "ssh {0} {1}".format(sshopts, url)
@@ -217,12 +217,17 @@ elif command=="process":
             branch = get_branch()
             home = os.path.expanduser('~')
             wake_up(args.wake)
-            sub = runner(shell)
-            _print_green (shell)
-            out, err = sub.first()
-            print(out, end='')
+            for tri in range(3):
+                sub = runner(shell)
+                _print_green (shell)
+                out, err = sub.first()
+                if not err:
+                    break
+                print(out, end='')
+                print ("failed connection on attempt %d of 3" % (tri+1))
             if err:
                 break
+            print ("Connection successful")
             subdo(sub, "rm -fr %s" % proj)
             out = subdo(sub, "git clone --single-branch --branch %s %s %s" % (branch, repo, proj), expect=["yes/no", "repository exists"])
             if "yes/no" in out:

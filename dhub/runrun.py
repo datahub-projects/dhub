@@ -158,8 +158,8 @@ def escape_ansi(line):
     return ansi_escape.sub('', line)
 
 
-PROMPT_TIMEOUT = 8
 SLEEPYTIME = .1
+SSH_FORCE_TIMEOUT = 30
 class runner:
     def __init__(self, cmd):
         self.pobj = sp.Popen(cmd.split(), stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT)
@@ -225,11 +225,17 @@ class runner:
 
     def first(self):
         o_dat = ""
+        t0 = time.time()
         while True:
+            # print ("  FIRST:",o_dat)
+            if time.time()-t0 > SSH_FORCE_TIMEOUT:
+                return o_dat, True
             o_dat += get_sub_stdout(self.q).decode('utf8')
             spl = o_dat.rstrip().split("\n")
             if len(spl) >= 2 and "last login" in spl[-2].lower():
                 break
+            if "timed out" in spl[-1]:
+                return o_dat, True
             time.sleep(SLEEPYTIME)
         # print (o_dat)
         prompt = escape_ansi(spl[-1])
