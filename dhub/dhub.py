@@ -26,6 +26,9 @@ bless_term = Terminal()
 def _print_green(s, **kw):
     print (bless_term.green(s), **kw)
 
+def _print_purple(s, **kw):
+    print (bless_term.magenta(s), **kw)
+
 parser = argparse.ArgumentParser(description=__doc__)
 subparsers = parser.add_subparsers(help='followed by --help for command-specific options')
 
@@ -51,6 +54,7 @@ proc_args.add_argument("--ssh")
 proc_args.add_argument("--name")
 proc_args.add_argument("--port")
 proc_args.add_argument("--source")
+proc_args.add_argument("--sync")
 proc_args.add_argument("--command", default="python entrypoint.py")
 proc_args.add_argument("--git") #=path to proj or .
 proc_args.add_argument("--wake") #instance ID
@@ -64,7 +68,7 @@ def wake_up(inst):
     if inst:
         cmd = ("aws ec2 start-instances --instance-ids %s" % inst).split()
         cmd2 = ("aws ec2 describe-instance-status --include-all-instances --instance-ids %s" % inst).split()
-        _print_green(' '.join(cmd))
+        _print_purple(' '.join(cmd))
         out, ok = run(cmd)
         print (out)
         print ("Waiting for %s to arise" % inst)
@@ -82,7 +86,7 @@ def wake_up(inst):
 #FIXME should be done solely on remote
 def go_to_sleep(inst):
     cmd = "aws ec2 stop-instances --instance-ids %s" % inst
-    _print_green(cmd)
+    _print_purple(cmd)
     sys.stdout.flush()
     os.system(cmd)
 
@@ -103,6 +107,22 @@ def subdo(sub, s, expect=None):
         ret += out
         s = None
     return ret
+
+def sync_to(base, paths, ssh):
+    if not ssh:
+        ssh = "~"
+    for p in paths.strip().split(','):
+        cmd = "rsync -vrltzu ./{1} {2}/{0}/{1}".format(base, p, ssh)
+        _print_purple("RSYNC_TO: " + cmd)
+        os.system(cmd)
+
+def sync_from(base, paths, ssh):
+    if not ssh:
+        ssh = "~"
+    for p in paths.strip().split(','):
+        cmd = "rsync -vrltzu {2}/{0}/{1} ./{1}".format(base, p, ssh)
+        _print_purple("RSYNC_FROM: " + cmd)
+        os.system(cmd)
 
 command=None
 if len(sys.argv)>1:
@@ -177,7 +197,7 @@ elif command=="process":
         shell = "ssh {0} {1}".format(sshopts, url)
     else:
         shell = "ssh -tt -4 localhost"
-    print ("SHELL COMMAND:", shell)
+    # print ("SHELL COMMAND:", shell)
 
     if args.source:
         f = open(args.source)
@@ -231,7 +251,7 @@ elif command=="process":
             wake_up(args.wake)
             for tri in range(3):
                 sub = runner(shell)
-                _print_green (shell)
+                _print_purple (shell)
                 out, err = sub.first()
                 if not err:
                     break
@@ -254,7 +274,8 @@ elif command=="process":
             if "fatal" in out:
                 break
             print ()
-            print ()
+            if args.sync:
+                sync_to(proj, args.sync, args.ssh)
             print ("Checking for Dockerfile")
             out, pr = sub.interact("""python3 -c 'import os; print(os.path.exists("Dockerfile"))'""")
             if "False" in out:
@@ -270,6 +291,9 @@ elif command=="process":
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
                 subdo(sub, "docker run --rm -it %s" % proj)
+            if args.sync:
+                print()
+                sync_from(proj, args.sync, args.ssh)
         if sub:
             sub.exit()
         if args.wake:
