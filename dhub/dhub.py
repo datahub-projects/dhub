@@ -90,13 +90,19 @@ def subdo(sub, s, expect=None):
     _print_green("\n-~> %s" % s.rstrip())
     done = False
     ret = ""
+    first = True
     while not done:
         out, done = sub.interact(s, expect)
-        print (out, end='')
+        if done:
+            print(out, end='')
+        elif out:
+            if first:
+                first = False               #first response==shi-tty echo
+            else:
+                print (out, end='')
         ret += out
         s = None
     return ret
-
 
 command=None
 if len(sys.argv)>1:
@@ -247,7 +253,10 @@ elif command=="process":
             subdo(sub, "cd %s" % proj)
             if "fatal" in out:
                 break
-            out = subdo(sub, """python3 -c 'import os; print(os.path.exists("Dockerfile"))'""")
+            print ()
+            print ()
+            print ("Checking for Dockerfile")
+            out, pr = sub.interact("""python3 -c 'import os; print(os.path.exists("Dockerfile"))'""")
             if "False" in out:
                 print ("No docker file found; setting up virtualenv")
                 subdo(sub, "virtualenv -p python3 venv")
