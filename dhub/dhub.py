@@ -112,7 +112,7 @@ def sync_to(base, paths, ssh):
     if not ssh:
         ssh = "~"
     for p in paths.strip().split(','):
-        cmd = "rsync -vrltzu ./{1} {2}/{0}/".format(base, p, ssh)
+        cmd = "rsync -vrltzu ./{1} {2}:{0}/".format(base, p, ssh)
         _print_purple("RSYNC_TO: " + cmd)
         os.system(cmd)
 
@@ -120,7 +120,7 @@ def sync_from(base, paths, ssh):
     if not ssh:
         ssh = "~"
     for p in paths.strip().split(','):
-        cmd = "rsync -vrltzu {2}/{0}/{1} ./".format(base, p, ssh)
+        cmd = "rsync -vrltzu {2}:{0}/{1} ./".format(base, p, ssh)
         _print_purple("RSYNC_FROM: " + cmd)
         os.system(cmd)
 
