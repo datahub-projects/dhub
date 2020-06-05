@@ -19,6 +19,8 @@ from dhub import get_pip
 from dhub.mod_sync import sync, mod
 from dhub.runrun import git_status, get_author, get_username, get_branch, get_repo, run, runner
 
+HOME_USER = "/home/ubuntu/"
+
 os.chdir(opath)
 
 bless_term = Terminal()
@@ -293,12 +295,12 @@ elif command=="process":
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
                 if args.sync:
-                    # out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
-                    out = subdo(sub, """python3 -uc 'import os; print(os.path.abspath("%s"))'""" % args.sync, show=False)
-                    # print ("\n\n\nRET:==>%s<==\n\n\n"%out.replace("\r","]"))
-                    abs = out.strip().split("\n")[-2].strip()
-                    print ("==>%s"%abs.replace("\r","]"))
-                    subdo(sub, "docker run --rm -it -v {0}:/{1} {2}".format(abs, args.sync, proj))
+                    # # out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
+                    # out = subdo(sub, """python3 -uc 'import os; print(os.path.abspath("%s"))'""" % args.sync, show=False)
+                    # # print ("\n\n\nRET:==>%s<==\n\n\n"%out.replace("\r","]"))
+                    # abs = out.strip().split("\n")[-2].strip()
+                    # print ("==>%s"%abs.replace("\r","]"))
+                    subdo(sub, "docker run --rm -it -v {0}{2}/{1}:{0}{1} {2}".format(HOME_USER, args.sync, proj))
                 else:
                     subdo(sub, "docker run --rm -it %s" % proj)
             if args.sync:
