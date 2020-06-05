@@ -110,7 +110,7 @@ def subdo(sub, s, expect=None):
 
 def sync_to(base, paths, ssh):
     if not ssh:
-        ssh = "~"
+        ssh = "localhost"
     for p in paths.strip().split(','):
         cmd = "rsync -vrltzu ./{1} {2}:{0}/".format(base, p, ssh)
         _print_purple("RSYNC_TO: " + cmd)
@@ -118,7 +118,7 @@ def sync_to(base, paths, ssh):
 
 def sync_from(base, paths, ssh):
     if not ssh:
-        ssh = "~"
+        ssh = "localhost"
     for p in paths.strip().split(','):
         cmd = "rsync -vrltzu {2}:{0}/{1} ./".format(base, p, ssh)
         _print_purple("RSYNC_FROM: " + cmd)
@@ -277,7 +277,7 @@ elif command=="process":
             if args.sync:
                 sync_to(proj, args.sync, args.ssh)
             print ("Checking for Dockerfile")
-            out, pr = sub.interact("""python3 -c 'import os; print(os.path.exists("Dockerfile"))'""")
+            out = subdo(sub, """python3 -uc 'import os; print(os.path.exists("Dockerfile"))'""")
             if "False" in out:
                 print ("No docker file found; setting up virtualenv")
                 subdo(sub, "virtualenv -p python3 venv")
@@ -291,10 +291,11 @@ elif command=="process":
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
                 if args.sync:
-                    out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
-                    print ("\nRET:==>%s<=="%out.replace("\r","]"))
+                    # out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
+                    out = subdo(sub, """python3 -uc 'import os; print(os.path.abspath("%s"))'""" % args.sync)
+                    print ("\n\n\nRET:==>%s<==\n\n\n"%out.replace("\r","]"))
                     abs = out.strip().split("\n")[-2].strip()
-                    print ("\nABS:==>%s<=="%abs)
+                    print ("\n\n\nABS:==>%s<==\n\n\n"%abs.replace("\r","]"))
                     subdo(sub, "docker run --rm -it -v {0}:/{1} {2}".format(abs, args.sync, proj))
                 else:
                     subdo(sub, "docker run --rm -it %s" % proj)
