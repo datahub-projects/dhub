@@ -290,7 +290,10 @@ elif command=="process":
             else:
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
-                subdo(sub, "docker run --rm -it %s" % proj)
+                if args.sync:
+                    subdo(sub, "docker run --rm -it -v {0}:{0} {1}".format(args.sync, proj))
+                else:
+                    subdo(sub, "docker run --rm -it %s" % proj)
             if args.sync:
                 print()
                 sync_from(proj, args.sync, args.ssh)
