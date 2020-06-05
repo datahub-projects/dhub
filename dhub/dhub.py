@@ -90,7 +90,7 @@ def go_to_sleep(inst):
     sys.stdout.flush()
     os.system(cmd)
 
-def subdo(sub, s, expect=None):
+def subdo(sub, s, expect=None, show=True):
     _print_green("\n-~> %s" % s.rstrip())
     done = False
     ret = ""
@@ -98,12 +98,14 @@ def subdo(sub, s, expect=None):
     while not done:
         out, done = sub.interact(s, expect)
         if done:
-            print(out, end='')
+            if show:
+                print(out, end='')
         elif out:
             if first:
                 first = False               #first response==shi-tty echo
             else:
-                print (out, end='')
+                if show:
+                    print (out, end='')
         ret += out
         s = None
     return ret
@@ -277,7 +279,7 @@ elif command=="process":
             if args.sync:
                 sync_to(proj, args.sync, args.ssh)
             print ("Checking for Dockerfile")
-            out = subdo(sub, """python3 -uc 'import os; print(os.path.exists("Dockerfile"))'""")
+            out = subdo(sub, """python3 -uc 'import os; print(os.path.exists("Dockerfile"))'""", show=False)
             if "False" in out:
                 print ("No docker file found; setting up virtualenv")
                 subdo(sub, "virtualenv -p python3 venv")
@@ -292,10 +294,10 @@ elif command=="process":
                 subdo(sub, "docker build . -t %s" % proj)
                 if args.sync:
                     # out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
-                    out = subdo(sub, """python3 -uc 'import os; print(os.path.abspath("%s"))'""" % args.sync)
-                    print ("\n\n\nRET:==>%s<==\n\n\n"%out.replace("\r","]"))
+                    out = subdo(sub, """python3 -uc 'import os; print(os.path.abspath("%s"))'""" % args.sync, show=False)
+                    # print ("\n\n\nRET:==>%s<==\n\n\n"%out.replace("\r","]"))
                     abs = out.strip().split("\n")[-2].strip()
-                    print ("\n\n\nABS:==>%s<==\n\n\n"%abs.replace("\r","]"))
+                    print ("==>%s"%abs.replace("\r","]"))
                     subdo(sub, "docker run --rm -it -v {0}:/{1} {2}".format(abs, args.sync, proj))
                 else:
                     subdo(sub, "docker run --rm -it %s" % proj)
