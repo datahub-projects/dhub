@@ -112,7 +112,7 @@ def sync_to(base, paths, ssh):
     if not ssh:
         ssh = "~"
     for p in paths.strip().split(','):
-        cmd = "rsync -vrltzu ./{1} {2}/{0}/{1}".format(base, p, ssh)
+        cmd = "rsync -vrltzu ./{1} {2}/{0}/".format(base, p, ssh)
         _print_purple("RSYNC_TO: " + cmd)
         os.system(cmd)
 
@@ -120,7 +120,7 @@ def sync_from(base, paths, ssh):
     if not ssh:
         ssh = "~"
     for p in paths.strip().split(','):
-        cmd = "rsync -vrltzu {2}/{0}/{1} ./{1}".format(base, p, ssh)
+        cmd = "rsync -vrltzu {2}/{0}/{1} ./".format(base, p, ssh)
         _print_purple("RSYNC_FROM: " + cmd)
         os.system(cmd)
 
@@ -291,7 +291,11 @@ elif command=="process":
                 print("Dockerfile found; building docker image")
                 subdo(sub, "docker build . -t %s" % proj)
                 if args.sync:
-                    subdo(sub, "docker run --rm -it -v {0}:{0} {1}".format(args.sync, proj))
+                    out, pr = sub.interact("""python3 -c 'import os; print(os.path.abspath("%s"))'""" % args.sync)
+                    print ("\nRET:==>%s<=="%out.replace("\r","]"))
+                    abs = out.strip().split("\n")[-2].strip()
+                    print ("\nABS:==>%s<=="%abs)
+                    subdo(sub, "docker run --rm -it -v {0}:/{1} {2}".format(abs, args.sync, proj))
                 else:
                     subdo(sub, "docker run --rm -it %s" % proj)
             if args.sync:
