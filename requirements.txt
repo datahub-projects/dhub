@@ -1,4 +1,4 @@
-requests==2.23.0                         #released Wed Feb 19 18:51:01 2020
+requests==2.31.0                         #released Wed Feb 19 18:51:01 2020
 python_dateutil==2.8.1                   #released Sun Nov  3 05:42:03 2019
 pipreqs==0.4.10                          #released Thu Nov 14 11:00:56 2019
 blessings==1.7                           #released Thu Jun 21 14:00:25 2018
