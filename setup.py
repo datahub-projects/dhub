@@ -6,7 +6,7 @@ setup(
     python_requires='>=3',
     scripts=['bin/dhub'],
     install_requires=[
-        "requests == 2.23.0",
+        "requests == 2.31.0",
         "blessings == 1.7",
         "python_dateutil == 2.8.1",
     ],
